@@ -1,0 +1,23 @@
+import 'package:flutter/material.dart';
+import '../../utilities/colors.dart';
+
+class LoadingPage extends StatelessWidget 
+{
+
+
+  @override
+  Widget build(BuildContext context) 
+  {
+
+    
+    return Scaffold(
+      backgroundColor: ruby,
+      body: Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(gray10),
+          strokeWidth: 2.0,
+        ),
+      ),
+    );
+  }
+}

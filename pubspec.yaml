@@ -14,11 +14,14 @@ description: A new Flutter project.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
+  provider: ^4.0.4
+  sqflite: ^1.3.0
+  path_provider: ^1.6.5
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -42,8 +45,9 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+   - assets/database.db
    - assets/images/background/
-   - assets/images/categories/
+   - assets/images/sections/
    - assets/images/icons/favorites/
    - assets/images/icons/sebha/
   #  - images/a_dot_ham.jpeg

@@ -1,14 +1,21 @@
+import '../../models/section_model.dart';
+import '../categories/categories_of_section.dart';
+
+import '../../providers/categories_provider.dart';
+import '../../providers/sections_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../utilities/colors.dart';
 
 class HomePage extends StatelessWidget 
 {
-  const HomePage({Key key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) 
   {
     final size=MediaQuery.of(context).size;
+    final sectionProvider=Provider.of<SectionsProvider>(context,listen: false);
+    final categoriesProvider=Provider.of<CategoriesProvider>(context,listen: false);
+
     return Stack(
       children: <Widget>[
         _buildBackgroundImage(size),
@@ -44,7 +51,8 @@ class HomePage extends StatelessWidget
                           ],
                         ),
                       ),
-                      _buildColumnCategories(size),
+                      for(int i=0 ; i<sectionProvider.length ; i+=2)
+                        _buildRowCategories(categoriesProvider,size,sectionProvider,i,context),
                     ],
                   ),
                 ),
@@ -72,7 +80,7 @@ class HomePage extends StatelessWidget
   Widget _buildSearchBar(Size size)
   {
     return InkWell(
-      onTap: (){
+      onTap: ()  {
         print('You click on search');
       },
       child: Container(
@@ -155,29 +163,7 @@ class HomePage extends StatelessWidget
     );
   }
 
-  Widget _buildColumnCategories(Size size)
-  {
-    List<String> names=[
-      'أذكار الصباح و المساء',
-      'أذكار الوضوء والصلاة',
-      'أذكار المرض والموت',
-      'أذكار السفر',
-      'أذكار الحج والعمرة',
-      'أذكار المحن والسرور',
-      'أذكار الحماية والايمان',
-      'حياة شخصية ',
-    ];
-    return Column(
-      children: <Widget>[
-        _buildRowCategories(size,names.sublist(0,2),'assets/images/categories/0.png','assets/images/categories/1.png'),
-        _buildRowCategories(size,names.sublist(2,4),'assets/images/categories/2.png','assets/images/categories/3.png'),
-        _buildRowCategories(size,names.sublist(4,6),'assets/images/categories/4.png','assets/images/categories/5.png'),
-        _buildRowCategories(size,names.sublist(6,8),'assets/images/categories/6.png','assets/images/categories/7.png'),
-      ],
-    );
-  }
-
-  Widget _buildRowCategories(Size size,List<String> names,String path1,String path2)
+  Widget _buildRowCategories(CategoriesProvider categoriesProvider,Size size,SectionsProvider sectionsProvider,int index,BuildContext context)
   {
     return Padding(
       padding: const EdgeInsets.only(bottom: 5.0),
@@ -185,51 +171,79 @@ class HomePage extends StatelessWidget
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          _buildCategoryCard(size,names[0],path1),
-          _buildCategoryCard(size,names[1],path2),
+          _buildCategoryCard(
+            categoriesProvider,
+            size,
+            sectionsProvider.getSection(index),
+            'assets/images/sections/'+sectionsProvider.getSection(index).id.toString()+'.png',
+            context
+          ),
+          _buildCategoryCard(
+            categoriesProvider,
+            size,
+            sectionsProvider.getSection(index+1),
+            'assets/images/sections/'+sectionsProvider.getSection(index+1).id.toString()+'.png',
+            context
+          ),
         ],
       ),
     );
   }
+  
 
-  Widget _buildCategoryCard(Size size,String text,String pathIcon)
+  Widget _buildCategoryCard(CategoriesProvider categoriesProvider,Size size,SectionModel sectionModel,String pathIcon,BuildContext context)
   {
     return Card(
       color: ruby30,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10)
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding:  EdgeInsets.all(5.0),
-              height: size.height*0.2,
-              width: size.width*0.4,
-              child: Image.asset(
-                pathIcon,
-                fit: BoxFit.contain,
-                height: size.height,
-              ),
-            ),
-            Container
-            (
-              width: size.width*0.4,
-              child: Text(
-                text,
-                textAlign: TextAlign.center,
-                style: new TextStyle(
-                  color: ruby,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 13,
+      child: Container(
+        height: size.height*0.25,
+        width: size.width*0.45,
+        child: InkWell(
+          highlightColor: ruby40,
+          borderRadius: BorderRadius.circular(10),
+          onTap: (){
+            print(categoriesProvider.getCategoriesOfSection(sectionModel.id).length);
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) {
+                return Directionality( // add this
+                  textDirection: TextDirection.rtl,
+                  child : CategoriesOfSection(categoriesProvider.getCategoriesOfSection(sectionModel.id),sectionModel.id)
+                );
+              }),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              children: <Widget>[
+                Expanded(
+                  child: Container(
+                    padding:  EdgeInsets.all(5.0),
+                    // height: size.height*0.15,
+                    width: size.width*0.4,
+                    child: Image.asset(
+                      pathIcon,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
-              ),
+                Text(
+                  sectionModel.name,
+                  textAlign: TextAlign.center,
+                  style: new TextStyle(
+                    color: ruby,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
-
 }
