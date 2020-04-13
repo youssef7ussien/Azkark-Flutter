@@ -58,8 +58,27 @@ class DatabaseHelper
     var dbClient=await database;
     List<Map<String,dynamic>> result=await dbClient.rawQuery('SELECT * FROM categories');
 
-    print('getAllSections done : ${result.length} ');
+    print('getAllCategories done : ${result.length} ');
     return result;
   }
+
+  Future<List<Map<String,dynamic>>> getAllItemsOfSebha() async
+  {
+    var dbClient=await database;
+    List<Map<String,dynamic>> result=await dbClient.rawQuery('SELECT * FROM tasbih');
+
+    print('getAllItemsOfSebha done : ${result.length} ');
+    return result;
+  }
+
+  Future<int> uptadeFavorite(int favorite,int id) async 
+  {
+    var dbClient=await database;
+    int result=await dbClient.rawUpdate('UPDATE categories SET favorite=$favorite WHERE id=$id');
+    
+    print('uptadeFavorite : $result');
+    return result; 
+  }
+
 
 }

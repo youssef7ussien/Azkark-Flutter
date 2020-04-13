@@ -48,6 +48,7 @@ flutter:
    - assets/database.db
    - assets/images/background/
    - assets/images/sections/
+   - assets/images/icons/asmaallah/
    - assets/images/icons/favorites/
    - assets/images/icons/sebha/
   #  - images/a_dot_ham.jpeg
