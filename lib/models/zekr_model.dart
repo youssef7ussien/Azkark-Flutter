@@ -16,13 +16,29 @@ class ZekrModel
 
   ZekrModel.fromMap(Map<String,dynamic> map)
   {
-    map['id']=_id;
-    map['category_id']=_categoryId;
-    map['text_with_diacritics']=_textWithDiacritics;
-    map['text_without_diacritics']=_textWithoutDiacritics;
-    map['sanad']=_sanad;
-    map['counter_text']=_counterText;
-    map['counter_number']=_counterNumber;
+    _id=map['id'];
+    _categoryId=map['category_id'];
+    _textWithDiacritics=map['text_with_diacritics'];
+    _textWithoutDiacritics=map['text_without_diacritics'];
+    _sanad=map['sanad'];
+    _counterText=map['counter_text'];
+    _counterNumber=map['counter_number'];
   }
+
+  int get id => _id;
+
+  int get categoryId => _categoryId;
+
+  String get textWithDiacritics => _textWithDiacritics;
+
+  get textWithoutDiacritics => _textWithoutDiacritics;
+
+  String get sanad => _sanad;
+
+  String get counterText => _counterText;
+
+  int get counterNumber => _counterNumber;
+
+
 
 }
