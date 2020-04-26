@@ -1,4 +1,5 @@
-import 'dart:math';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import '../../providers/categories_provider.dart';
 import '../../utilities/colors.dart';
 import '../../utilities/background.dart';
@@ -8,24 +9,41 @@ import 'package:provider/provider.dart';
 
 class ViewAzkar extends StatefulWidget 
 {
-
   @override
   _ViewAzkarState createState() => _ViewAzkarState();
 }
 
+enum PopUpMenu {Favorite ,TurnOnCounter ,TurnOnDiacritics ,RefreshAll , About}
+enum PopUpFontSize {Increase , Decrease}
+
 class _ViewAzkarState extends State<ViewAzkar> 
 {
-  int onFavorite,numberZekr,counter;
-  double percentage;
+  int onFavorite;
+  bool _showSliderFont,_isCounterOpen,_isDiacriticsOpen;
+  List<bool> isFinish,showSanad;
+  double percentage,fontSize;
+  List<int> counter;
+
   @override
   void initState() 
   {
     super.initState();
     int id=Provider.of<AzkarProvider>(context,listen: false).getZekr(0).categoryId;
     onFavorite=Provider.of<CategoriesProvider>(context,listen: false).getCategory(id).favorite;
-    numberZekr=1;
     percentage=0.0;
-    counter=0;
+    _showSliderFont=false;
+    _isCounterOpen=true;
+    _isDiacriticsOpen=true;
+    fontSize=14;
+    counter=List<int>();
+    isFinish=List<bool>();
+    showSanad=List<bool>();
+    for(int i=0 ; i<Provider.of<AzkarProvider>(context,listen: false).length ; i++)
+    {
+      counter.add(0);
+      isFinish.add(false);
+      showSanad.add(false);
+    }
   }
 
   @override
@@ -39,47 +57,52 @@ class _ViewAzkarState extends State<ViewAzkar>
       children: <Widget>[
         Background(),
         Scaffold(
-          backgroundColor: Colors.transparent,
           appBar: AppBar(
             elevation: 0.0,
             title: Text(
               categoriesProvider.getCategory(azkarProvider.getZekr(0).categoryId).nameWithDiacritics,
               overflow: TextOverflow.ellipsis,
               style: new TextStyle(
-                color: ruby10,
+                color: ruby[50],
                 fontWeight: FontWeight.w700,
                 fontSize: 16,
               ),
             ),
+            actions: <Widget>[
+              _buildButtonFontSize(),
+              _buildPopUpMenu(categoriesProvider,azkarProvider),
+            ],
           ),
           body: Stack(
+
             children: <Widget>[
-              Align(
-                alignment: Alignment.center,
-                child: SizedBox(
-                  height: size.height,
-                  width: size.width,
-                  child: PageView.builder(
-                    itemCount: azkarProvider.length,
-                    itemBuilder:(context, int index) {
-                      return _buildPageOfZekr(categoriesProvider,azkarProvider,size,index);
-                    },
-                    onPageChanged: (value)
-                    {
-                      setState(() {
-                        numberZekr=value+1;
-                        counter=0;
-                        percentage=0.0;
-                      });
-                    },
-                  ),
+              SizedBox(
+                width: size.width,
+                height: size.height,
+                child: ListView.builder(
+                  physics: BouncingScrollPhysics(),
+                  itemCount: azkarProvider.length,
+                  itemBuilder:(context, int index) {
+                    return Padding(
+                      padding: 
+                        index==0 ? 
+                          const EdgeInsets.only(top: 12.0,bottom: 6.0,left: 12.0,right: 12.0)
+                        : index==azkarProvider.length-1 ?
+                          const EdgeInsets.only(top: 6.0,bottom: 12.0,left: 12.0,right: 12.0)
+                        : const EdgeInsets.only(top: 6.0,bottom: 6.0,left: 12.0,right: 12.0),
+                      child: _buildZekrCard(azkarProvider,index,size),
+                    );
+                  },
                 ),
               ),
-              _buildTopWidgetMain(categoriesProvider,azkarProvider,size),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: _buildBottomWidgetMain(azkarProvider,size)
-              ),
+              if(_showSliderFont)
+                Padding(
+                  padding: EdgeInsets.only(bottom: 15.0),
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: _buildSliderFontSize(size)
+                  ),
+                ),
             ],
           )
         ),
@@ -87,160 +110,413 @@ class _ViewAzkarState extends State<ViewAzkar>
     );
   }
 
-  Widget _buildTopWidgetMain(CategoriesProvider categoriesProvider,AzkarProvider azkarProvider,Size size)
+  Widget _buildPopUpMenu(CategoriesProvider categoriesProvider,AzkarProvider azkarProvider)
   {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.only(left: 5.0),
+      child: PopupMenuButton<PopUpMenu>(
+        offset: Offset(0,50),
+        onSelected:(PopUpMenu result) async {
+          switch(result)
+          {
+            case PopUpMenu.Favorite:
+            {
+              print('You clicked on Favorite');
+              setState(() {
+                onFavorite==1 ? onFavorite=0 : onFavorite=1;
+              });
+              await categoriesProvider.updateFavorite(onFavorite,azkarProvider.getZekr(0).id);
+            } break;
+
+            case PopUpMenu.TurnOnCounter:
+            {
+              setState(() {
+              _isCounterOpen ? _isCounterOpen=false : _isCounterOpen=true;
+            });
+            } break;
+
+            case PopUpMenu.TurnOnDiacritics:
+            {
+              setState(() {
+              _isDiacriticsOpen ? _isDiacriticsOpen=false : _isDiacriticsOpen=true;
+            });
+            } break;
+            
+            case PopUpMenu.RefreshAll:
+            {
+              setState(() {
+                for(int i=0 ; i<azkarProvider.length ; i++)
+                {
+                  counter[i]=0;
+                  isFinish[i]=false;
+                }
+              });
+            } break;
+
+            case PopUpMenu.About:
+              break;
+          }
+        },
+        itemBuilder: (context){
+          return [
+            PopupMenuItem<PopUpMenu>(
+              value: PopUpMenu.Favorite,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    height: 25,
+                    width: 25,
+                    decoration: BoxDecoration(
+                      color: ruby[100],
+                      shape: BoxShape.circle,
+                    ),
+                    padding: EdgeInsets.all(3.0),
+                    child: Image.asset(
+                      onFavorite==1 ? 
+                      'assets/images/icons/favorites/favorite_128px.png'
+                      : 'assets/images/icons/favorites/nonfavorite_128px.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  Container(
+                    width: 150,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      onFavorite==1 ? 'تم الإضافة إلي المفضلة' : 'الإضافة إلي المفضلة',
+                      textAlign: TextAlign.right,
+                      style: new TextStyle(
+                        color: ruby[900],
+                        fontWeight: FontWeight.w300,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuItem<PopUpMenu>(
+              value: PopUpMenu.TurnOnCounter,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  FaIcon(
+                    _isCounterOpen ? FontAwesomeIcons.toggleOn : FontAwesomeIcons.toggleOff,
+                    color:_isCounterOpen ? ruby[500] : ruby,
+                    size: 20,
+                  ),
+                  Container(
+                    width: 150,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      _isCounterOpen ? 'تم تشغيل العداد' : 'تشغيل العداد',
+                      textAlign: TextAlign.right,
+                      style: new TextStyle(
+                        color: ruby[900],
+                        fontWeight: FontWeight.w300,
+                        fontSize: 14,
+                      ),  
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuItem<PopUpMenu>(
+              value: PopUpMenu.TurnOnDiacritics,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  FaIcon(
+                    _isDiacriticsOpen ? FontAwesomeIcons.toggleOn : FontAwesomeIcons.toggleOff,
+                    color:_isDiacriticsOpen ? ruby[500] : ruby,
+                    size: 20,
+                  ),
+                  Container(
+                    width: 150,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      _isDiacriticsOpen ? 'تم وضع التشكيل' : 'وضع التشكيل',
+                      textAlign: TextAlign.right,
+                      style: new TextStyle(
+                        color: ruby[900],
+                        fontWeight: FontWeight.w300,
+                        fontSize: 14,
+                      ),  
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuItem<PopUpMenu>(
+              value: PopUpMenu.RefreshAll,
+              enabled: _isCounterOpen ? true : false,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Icon(
+                    Icons.refresh,
+                    textDirection: TextDirection.rtl,
+                    color: ruby,
+                    size: 25,
+                  ),
+                  Container(
+                    width: 150,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      'تصفير العداد',
+                      textAlign: TextAlign.right,
+                      style: new TextStyle(
+                        color: _isCounterOpen ? ruby[900] : ruby[900].withAlpha(125),
+                        fontWeight: FontWeight.w300,
+                        fontSize: 14,
+                      ),  
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuItem<PopUpMenu>(
+              value: PopUpMenu.About,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Icon(
+                    Icons.help_outline,
+                    color: ruby,
+                    size: 25,
+                  ),
+                  Container(
+                    width: 150,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      'حول',
+                      textAlign: TextAlign.right,
+                      style: new TextStyle(
+                        color: ruby[900],
+                        fontWeight: FontWeight.w300,
+                        fontSize: 14,
+                      ),  
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ];
+        },
+      ),
+    );
+  }
+
+  Widget _buildButtonFontSize()
+  {
+    return IconButton(
+      padding: EdgeInsets.all(0.0),
+      highlightColor: Colors.transparent,
+      splashColor: ruby[700],
+      icon: Container(
+        padding: EdgeInsets.only(top: 2.5,bottom: 2.5,left: 5.0,right: 5.0),
+        decoration: BoxDecoration(
+          color: _showSliderFont ? ruby[100] : Colors.transparent,
+          borderRadius: BorderRadius.circular(10)
+        ),
+        child: FaIcon(
+          FontAwesomeIcons.font,
+          color: _showSliderFont ? ruby[800] : ruby[100],
+          size: 20,
+        ),
+      ),
+      onPressed: (){
+        setState(() {
+          _showSliderFont ? _showSliderFont=false : _showSliderFont=true;
+        });
+      }
+    );
+  }
+
+  Widget _buildSliderFontSize(Size size)
+  {
+    return Container(
+      padding: const EdgeInsets.only(right: 5.0,left: 8.0),
+      width: size.width*0.8,
+      height: size.height*0.1,
+      decoration: BoxDecoration(
+        color: ruby[100].withAlpha(175),
+        borderRadius: BorderRadius.circular(15),
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          _buildNumberOfAzkar(azkarProvider,numberZekr),
-          _buildFavoriteButton(categoriesProvider,azkarProvider.getZekr(0).categoryId),
+          Container(
+            width: size.width*0.7,
+            child: SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                activeTrackColor: ruby[600],
+                inactiveTrackColor: ruby[300],
+                trackShape: RoundedRectSliderTrackShape(),
+                trackHeight: 4.0,
+                thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
+                thumbColor: ruby[500],
+                overlayColor: ruby[900].withAlpha(15),
+                overlayShape: RoundSliderOverlayShape(overlayRadius: 14.0),
+                tickMarkShape: RoundSliderTickMarkShape(),
+                activeTickMarkColor: ruby[600],
+                inactiveTickMarkColor: ruby[300],
+                valueIndicatorShape: PaddleSliderValueIndicatorShape(),
+                valueIndicatorColor: ruby[500],
+                valueIndicatorTextStyle: TextStyle(
+                  color: ruby[100],
+                  fontSize: fontSize,
+                ),
+              ),
+              child: Slider(
+                min: 14,
+                max: 30,
+                divisions: 8,
+                label: '$fontSize',
+                value: fontSize,
+                onChanged: (value) {
+                  setState(() {
+                    fontSize=value;
+                  });
+                },
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildBottomWidgetMain(AzkarProvider azkarProvider,Size size)
-  {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      width: size.width,
-      height: 100,
-      child: InkWell(
-        highlightColor: Colors.transparent,
-        splashColor: Colors.transparent,
-        onTap: (){
-          setState(() {
-            counter++;
-            percentage=((counter*100)/azkarProvider.getZekr(numberZekr-1).counterNumber)*0.01;
-          });
-        },
-        child: Stack(
-          alignment: AlignmentDirectional.center,
-          children: <Widget>[
-            Align(
-              alignment: Alignment.centerRight,
-              child: _buildNumberRepetitions(azkarProvider,size),
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: _buildCounterButton(azkarProvider,size),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPageOfZekr(CategoriesProvider categoriesProvider,AzkarProvider azkarProvider,Size size,int index)
-  {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: EdgeInsets.only(
-          top: size.height*0.1,
-          bottom: 80,
-        ),
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _buildTextZekr(azkarProvider,index,size),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _buildTextSanad(azkarProvider,index,size),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFavoriteButton(CategoriesProvider categoriesProvider,int id)
+  Widget _buildZekrCard(AzkarProvider azkarProvider,int index,Size size)
   {
     return Material(
-      color: ruby20,
+      color: isFinish[index] ? ruby[200] : ruby[300],
       borderRadius: BorderRadius.circular(10),
       child: InkWell(
-        highlightColor: ruby40,
-        splashColor: ruby40,
+        highlightColor: Colors.transparent,
+        splashColor: ruby[200],
         borderRadius: BorderRadius.circular(10),
-        onTap: () async {
-          print('You clicked on Favorite');
+        onTap: _isCounterOpen ?  (){
           setState(() {
-            onFavorite==1 ? onFavorite=0 : onFavorite=1;
+          if(counter[index]<azkarProvider.getZekr(index).counterNumber)
+          {
+            counter[index]++;
+            if(counter[index]==azkarProvider.getZekr(index).counterNumber) 
+              isFinish[index]=true;
+          }
+          // percentage=((counter*100)/azkarProvider.getZekr(index).counterNumber)*0.01;
           });
-          await categoriesProvider.updateFavorite(onFavorite,id);
-        },
+        } : null,
         child: Container(
-          height: 40,
-          width: 40,
+          width: size.width,
+          padding: EdgeInsets.all(15.0),
           decoration: BoxDecoration(
-          color: Colors.transparent,
-          border: Border.all(color:ruby50),
-          borderRadius: BorderRadius.circular(10),
-        ),
-          padding:  EdgeInsets.all(5.0),
-          child: Image.asset(
-            onFavorite==1 ? 
-            'assets/images/icons/favorites/favorite_128px.png'
-            : 'assets/images/icons/favorites/nonfavorite_128px.png' ,
-            fit: BoxFit.contain,
+            // color: isFinish[index] ? ruby[200] : ruby[300],
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            children: <Widget>[
+              _buildRefreshButton(azkarProvider,index,size),
+              _buildTextZekr(azkarProvider,index,size),
+              Padding(
+                padding: const EdgeInsets.only(top: 15.0),
+                child: _buildNumberRepetitions(azkarProvider,index,size),
+              ),
+              _buildBottomWidget(azkarProvider,index,size),
+              if(showSanad[index])
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: _buildTextSanad(azkarProvider,index,size),
+                ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildNumberOfAzkar(AzkarProvider azkarProvider,int number)
+  Widget _buildRefreshButton(AzkarProvider azkarProvider,int number,Size size)
+  {
+    if(isFinish[number])
+      return Align(
+        alignment: Alignment.topLeft,
+        child: InkWell(
+          onTap: (){
+            setState(() {
+              isFinish[number]=false;
+              counter[number]=0;
+            });
+          },
+          child: Icon(
+            Icons.refresh,
+            color: isFinish[number] ? ruby[400] : ruby[600],
+          ),
+        ),
+      ); 
+    else 
+      return SizedBox(
+        height: 22,
+      ); 
+  }
+
+  Widget _buildTextZekr(AzkarProvider azkarProvider,int number,Size size)
+  {
+    return Text(
+      _isDiacriticsOpen ? 
+        azkarProvider.getZekr(number).textWithDiacritics
+        : azkarProvider.getZekr(number).textWithoutDiacritics,
+      textAlign: TextAlign.center,
+      style: new TextStyle(
+        color: isFinish[number] ? ruby[400] : ruby[900],
+        fontSize: fontSize,
+      ),
+    );
+  }
+
+  Widget _buildBottomWidget(AzkarProvider azkarProvider,int number,Size size)
+  {
+    return Padding(
+      padding: const EdgeInsets.only(top: 15.0),
+      child: Stack(
+        alignment: AlignmentDirectional.center,
+        children: <Widget>[
+          Align(
+            alignment: Alignment.centerRight,
+            child: _buildNumberOfAzkar(azkarProvider,number+1,size)
+          ),
+          if(counter[number]!=0)
+            Align(
+              alignment: Alignment.center,
+              child: _buildCounter(azkarProvider,number,size)
+            ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: InkWell(
+              onTap: (){
+                setState(() {
+                  showSanad[number] ? showSanad[number]=false : showSanad[number]=true;
+                });
+              },
+              child: Icon(
+                showSanad[number] ? Icons.info : Icons.info_outline,
+                color: isFinish[number] ? ruby[400] : ruby[600],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNumberOfAzkar(AzkarProvider azkarProvider,int number,Size size)
   {
     return Container(
-      padding: EdgeInsets.only(top: 8.0,bottom: 8.0,left: 15.0,right: 15.0),
-      decoration: BoxDecoration(
-        color: ruby20,
-        border: Border.all(color:ruby50),
-        borderRadius: BorderRadius.circular(10),
-      ),
+      padding: EdgeInsets.only(bottom: 8.0),
       child: Text(
         'الذكر $number من ${azkarProvider.length}',
         style: new TextStyle(
-          color: rubyDark,
+          color: ruby[400],
           fontSize: 14,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextZekr(AzkarProvider azkarProvider,int index,Size size)
-  {
-    return InkWell(
-      highlightColor: Colors.transparent,
-      splashColor: Colors.transparent,
-      onTap: (){
-        setState(() {
-          counter++;
-          percentage=((counter*100)/azkarProvider.getZekr(numberZekr-1).counterNumber)*0.01;
-        });
-      },
-      child: Container(
-        width: size.width,
-        padding: EdgeInsets.all(20.0),
-        constraints: BoxConstraints(
-            minHeight: size.height*0.4,
-            maxHeight: double.infinity,
-        ),
-        decoration: BoxDecoration(
-          color: ruby30,
-          // border: Border.all(color:ruby),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Text(
-          azkarProvider.getZekr(index).textWithDiacritics,
-          style: new TextStyle(
-            color: rubyDark,
-            fontSize: 14,
-          ),
         ),
       ),
     );
@@ -252,114 +528,53 @@ class _ViewAzkarState extends State<ViewAzkar>
       width: size.width,
       padding: EdgeInsets.only(left: 15.0,right: 15.0),
       decoration: BoxDecoration(
-        color: ruby20,
-        border: Border.all(color:ruby30),
+        color: isFinish[index] ? ruby[100] : ruby[200],
         borderRadius: BorderRadius.circular(10),
       ),
-      child: ExpansionTile(
-        initiallyExpanded: false,
-        title: Text(
-          'معلومات',
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          azkarProvider.getZekr(index).sanad,
           style: new TextStyle(
-            color: gray80,
+            color: isFinish[index] ? ruby[400] : ruby[600],
             fontSize: 12,
-          ),
-        ),
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              azkarProvider.getZekr(index).sanad,
-              style: new TextStyle(
-                color: gray80,
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildCounterButton(AzkarProvider azkarProvider,Size size)
-  {
-    double radius=30;
-    return CustomPaint(
-      painter: CircleCounter(percentage,radius),
-      child: Container(
-        height: radius*2,
-        width: radius*2,
-        child: Center(
-          child: Text(
-            counter.toString(),
-            style: new TextStyle(
-              color: ruby10,
-              fontSize: 20, //percentage=((currentCounter*100)/widget._tasbih.counter)*0.01;
-            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildNumberRepetitions(AzkarProvider azkarProvider,Size size)
+  Widget _buildCounter(AzkarProvider azkarProvider,int numberZekr,Size size)
   {
     return Container(
-      width: size.width*0.9,
       padding: EdgeInsets.only(top: 5.0,bottom: 5.0,left: 15.0,right: 15.0),
       decoration: BoxDecoration(
-        color: ruby80,
-        borderRadius: BorderRadius.circular(10),
+        color: isFinish[numberZekr] ? ruby[300] : ruby[500],
+        borderRadius: BorderRadius.circular(15),
       ),
       child: Text(
-        azkarProvider.getZekr(numberZekr-1).counterText==null ?
-        'مرة واحدة' : azkarProvider.getZekr(numberZekr-1).counterText,
+        '${counter[numberZekr]} / ${azkarProvider.getZekr(numberZekr).counterNumber}',
         style: new TextStyle(
-          color: ruby10,
+          color: isFinish[numberZekr] ? ruby[400] : ruby[100],
           fontSize: 14,
         ),
       ),
     );
   }
 
-}
-
-class CircleCounter extends CustomPainter 
-{
-  double _percentage,_radius;
-  CircleCounter(this._percentage,this._radius);
-
-  @override
-  void paint(Canvas canvas, Size size) 
+  Widget _buildNumberRepetitions(AzkarProvider azkarProvider,int numberZekr,Size size)
   {
-    Paint circle=new Paint()
-    ..color=ruby
-    ..strokeCap=StrokeCap.round
-    ..style=PaintingStyle.fill
-    ..strokeWidth=20;
-
-    Paint complete=new Paint()
-      ..color=yellow
-      ..strokeCap=StrokeCap.round
-      ..style=PaintingStyle.stroke
-      ..strokeWidth=8;
-
-    canvas.drawCircle(Offset(_radius,size.height-_radius), _radius, circle);
-
-    double arcAngle=2*pi*(_percentage);
-    canvas.drawArc(
-        new Rect.fromCircle(center: Offset(_radius,size.height-_radius),radius: _radius),
-        -pi,
-        arcAngle,
-        false,
-        complete
+    return Container(
+      padding: EdgeInsets.only(top: 5.0,bottom: 5.0,left: 15.0,right: 15.0),
+      child: Text(
+        azkarProvider.getZekr(numberZekr).counterText==null ?
+        'مرة واحدة' : azkarProvider.getZekr(numberZekr).counterText,
+        style: new TextStyle(
+          color: isFinish[numberZekr] ? ruby[400] : ruby[700],
+          fontSize: 12,
+        ),
+      ),
     );
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) 
-  {
-    return true;
   }
 
 }

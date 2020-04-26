@@ -1,3 +1,5 @@
+import 'package:azkark/providers/azkar_provider.dart';
+import 'package:flutter/services.dart';
 import 'providers/categories_provider.dart';
 import 'providers/sections_provider.dart';
 import 'package:flutter/material.dart';
@@ -13,12 +15,17 @@ class MyApp extends StatelessWidget
 {
   @override
   Widget build(BuildContext context) 
-  {
+  { 
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<SectionsProvider>(create: (context) => SectionsProvider()),
         ChangeNotifierProvider<CategoriesProvider>(create: (context) => CategoriesProvider()),
         ChangeNotifierProvider<SebhaProvider>(create: (context) => SebhaProvider()),
+        ChangeNotifierProvider<AzkarProvider>(create: (context) => AzkarProvider()),
       ],
       child: Consumer<SectionsProvider>(
         builder: (context,sectionProvider,widget)

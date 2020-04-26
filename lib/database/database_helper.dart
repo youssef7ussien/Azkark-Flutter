@@ -80,5 +80,14 @@ class DatabaseHelper
     return result; 
   }
 
+  Future<List<Map<String,dynamic>>> getAllAzkar(String azkarIndex) async
+  {
+    var dbClient=await database;
+    List<Map<String,dynamic>> result=await dbClient.rawQuery('SELECT * FROM azkar WHERE id IN ($azkarIndex)');
+
+    print('getAllAzkar done : ${result.length}');
+    return result;
+  }
+
 
 }
