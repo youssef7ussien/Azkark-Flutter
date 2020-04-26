@@ -1,3 +1,6 @@
+// import '../../pages/azkar/view_azkar.dart';
+import '../../pages/azkar/view_azkar.dart';
+import '../../providers/azkar_provider.dart';
 import '../../models/category_model.dart';
 import '../../providers/categories_provider.dart';
 import '../../utilities/colors.dart';
@@ -30,20 +33,30 @@ class _CategoryState extends State<Category>
   {
     final size=MediaQuery.of(context).size;
     final categoriesProvider=Provider.of<CategoriesProvider>(context,listen: false);
+    final azkarProvider=Provider.of<AzkarProvider>(context,listen: false);
 
     return Card(
-      color: ruby30,
+      color: ruby[300],
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10)
       ),
       child: Container(
-        height: 60,
         width: size.width,
         child: InkWell(
-          highlightColor: ruby20,
+          highlightColor: ruby[100],
           borderRadius: BorderRadius.circular(10),
-          onTap: (){
+          onTap: () async {
             print('${widget._category.nameWithDiacritics}');
+            print('${categoriesProvider.getCategory(widget._category.id).azkarIndex}');
+            await azkarProvider.initialAllAzkar(categoriesProvider.getCategory(widget._category.id).azkarIndex);
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) {
+                return Directionality(
+                  textDirection: TextDirection.rtl,
+                  child : ViewAzkar(),
+                );
+              }),
+            );
           },
           child: Padding(
             padding: const EdgeInsets.all(10.0),
@@ -79,17 +92,19 @@ class _CategoryState extends State<Category>
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(10),
       child: InkWell(
-        highlightColor: ruby40,
-        splashColor: ruby40,
+        highlightColor: ruby[400],
+        splashColor: ruby[400],
         borderRadius: BorderRadius.circular(10),
         onTap: () async {
           print('You clicked on Favorite');
           setState(() {
             onFavorite==1 ? onFavorite=0 : onFavorite=1;
           });
-          await categoriesProvider.uptadeFavorite(onFavorite,widget._category.id);
+          await categoriesProvider.updateFavorite(onFavorite,widget._category.id);
         },
         child: Container(
+          height: 45,
+          width: 45,
           padding:  EdgeInsets.all(5.0),
           child: Image.asset(
             onFavorite==1 ? 

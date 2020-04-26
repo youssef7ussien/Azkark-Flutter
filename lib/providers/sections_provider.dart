@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'categories_provider.dart';
+import 'sebha_provider.dart';
 
 class SectionsProvider with ChangeNotifier
 {
@@ -21,21 +22,11 @@ class SectionsProvider with ChangeNotifier
     return _sections[index];
   }
 
-  bool addSection(int id,String name)
+  List<int> getCategoriesIndex(int id)
   {
-    try
-    {
-      _sections.add(SectionModel(id,name));
-      notifyListeners();
-      return true;
-    }
-    catch(e)
-    {
-      print('addSection e : $e');
-      return false;
-    }
+    return _sections[id].categoriesIndex;
   }
-
+  
   Future<bool> initialAllSections() async
   {
     try
@@ -70,14 +61,16 @@ class SectionsProvider with ChangeNotifier
     }
 
     _newUser=true;
-      print('_newUser = true');
+      print('tryToGetData _newUser = true');
     notifyListeners();
 
     await initialAllSections();
-    print('_initial');
+    print('initialAllSections');
     try 
     {
       await Provider.of<CategoriesProvider>(context,listen: false).initialAllCategories();
+      await Provider.of<SebhaProvider>(context,listen: false).initialAllItemsOfSebha();
+      print('initialAllCategories');
     }
     catch(e)
     {

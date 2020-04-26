@@ -6,9 +6,6 @@ class CategoriesProvider with ChangeNotifier
 {
   List<CategoryModel> _categories=List<CategoryModel>();
   DatabaseHelper databaseHelper=new DatabaseHelper();
-  // bool _newUser=true;
-
-  // bool get isNewUser => _newUser;
 
   int get length => _categories.length;
 
@@ -17,15 +14,20 @@ class CategoriesProvider with ChangeNotifier
     return _categories[index];
   }
 
-  List<int> getCategoriesOfSection(int sectionId)
+  Future<bool> updateFavorite(int favorite,int id) async
   {
-    List<int> listId=List<int>();
-    for(int i=0; i<length ; i++)
+    _categories[id].setFavorite(favorite);
+    try
     {
-      if(_categories[i].sectionId==sectionId)
-        listId.add(i);
+      await databaseHelper.uptadeFavorite(favorite,id);
+      print('uptadeFavorite : true');
+      return true; 
     }
-    return listId;
+    catch(e)
+    {
+      print('uptadeFavorite e : $e');
+      return false;
+    }
   }
 
   Future<bool> initialAllCategories() async
@@ -44,7 +46,7 @@ class CategoriesProvider with ChangeNotifier
     }
     catch(e)
     {
-      print('Faild initialAllSections');
+      print('Faild initialAllCategories');
       print('e : $e');
       return false;
     }
