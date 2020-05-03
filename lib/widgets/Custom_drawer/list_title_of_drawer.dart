@@ -22,15 +22,11 @@ class DrawerListTitle extends StatefulWidget
 
 class _DrawerListTitleState extends State<DrawerListTitle> 
 {
-  Animation<double> widthAnimation,fontSizeAnimation;
+  Animation<double> fontSizeAnimation;
 
   @override
   void initState() {
     super.initState();
-    widthAnimation=Tween<double>(
-      begin: 70, 
-      end: 200
-    ).animate(widget.animationController);
     fontSizeAnimation=Tween<double>(
       begin: 0, 
       end: 14
@@ -45,12 +41,11 @@ class _DrawerListTitleState extends State<DrawerListTitle>
     return InkWell(
       onTap: widget.onTap,
       child: Container(
-        width: widthAnimation.value,
         height: size.height*0.08,
-        margin: EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
-        padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
+        margin: EdgeInsets.all(5.0),
+        padding: EdgeInsets.all(5.0),
         decoration: BoxDecoration(
-          color: widget.isSelected ? Colors.white : Colors.transparent,
+          color: widget.isSelected ? ruby[50] : Colors.transparent,
           borderRadius: BorderRadius.circular(10)
         ),
         child: Stack(
@@ -86,9 +81,12 @@ class _DrawerListTitleState extends State<DrawerListTitle>
 
   Widget _buildImageSection()
   {
-    return Image.asset(
-      widget.pathIcon,
-      fit: BoxFit.contain,
+    return Padding(
+      padding: widget.isSelected ? EdgeInsets.all(0.0) : EdgeInsets.all(2.5),
+      child: Image.asset(
+        widget.pathIcon,
+        fit: BoxFit.contain,
+      ),
     );
   }
 }

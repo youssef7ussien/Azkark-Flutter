@@ -1,10 +1,14 @@
-import 'package:azkark/database/database_helper.dart';
-import 'package:azkark/models/section_model.dart';
+import 'package:azkark/providers/settings_provider.dart';
+
+import '../database/database_helper.dart';
+import '../models/section_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'asmaallah_provider.dart';
 import 'categories_provider.dart';
+import 'favorites_provider.dart';
+import 'prayer_provider.dart';
 import 'sebha_provider.dart';
 
 class SectionsProvider with ChangeNotifier
@@ -68,9 +72,13 @@ class SectionsProvider with ChangeNotifier
     print('initialAllSections');
     try 
     {
+      await Provider.of<SettingsProvider>(context,listen: false).initialSettings();
       await Provider.of<CategoriesProvider>(context,listen: false).initialAllCategories();
       await Provider.of<SebhaProvider>(context,listen: false).initialAllItemsOfSebha();
-      print('initialAllCategories');
+      await Provider.of<FavoritesProvider>(context,listen: false).initialAllFavorites();
+      await Provider.of<PrayerProvider>(context,listen: false).initialAllPrayer();
+      await Provider.of<AsmaAllahProvider>(context,listen: false).initialAllAsmaAllah();
+      print('initialAllCategories, initialAllItemsOfSebha, initialAllFavorites, initialAllPrayer, initialSettings');
     }
     catch(e)
     {

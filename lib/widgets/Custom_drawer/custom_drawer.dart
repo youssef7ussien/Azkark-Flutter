@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 class CustomDrawer extends StatefulWidget 
 {
   final double maxWidth , minWidth;
-  final Function onTap;
+  final Function onTap,onPressedIndex,onSwipeLeft,onSwipeRight;
+  final int currentIndex;
   final AnimationController animationController;
   
   CustomDrawer({
@@ -15,6 +16,10 @@ class CustomDrawer extends StatefulWidget
     @required this.minWidth,
     @required this.maxWidth,
     this.onTap,
+    this.onSwipeLeft,
+    this.onSwipeRight,
+    this.currentIndex,
+    this.onPressedIndex,
   });
 
   @override
@@ -23,22 +28,18 @@ class CustomDrawer extends StatefulWidget
 
 class _CustomDrawerState extends State<CustomDrawer> with SingleTickerProviderStateMixin 
 {
-  double maxWidth;
-  double minWidth;
   Animation<double> widthAnimation;
   Animation<double> shadowAnimation;
-  int currentSelectedIndex;
+  int currentIndex;
 
   @override
   void initState() 
   {
     super.initState();
-    currentSelectedIndex=0;
-    minWidth=widget.minWidth;
-    maxWidth=widget.maxWidth;
+    currentIndex=widget.currentIndex;
     widthAnimation=Tween<double>(
-      begin: minWidth,
-      end: maxWidth
+      begin: widget.minWidth,
+      end: widget.maxWidth
     ).animate(widget.animationController);
     shadowAnimation=Tween<double>(
       begin: 0,
@@ -47,7 +48,11 @@ class _CustomDrawerState extends State<CustomDrawer> with SingleTickerProviderSt
   }
 
   AnimationController get animationController => widget.animationController;
+  double get minWidth => widget.minWidth;
   Function get onTap => widget.onTap;
+  Function get onSwipeLeft => widget.onSwipeLeft;
+  Function get onSwipeRight => widget.onSwipeRight;
+  Function  onPressedIndex() =>  widget.onPressedIndex(currentIndex);
 
   @override
   Widget build(BuildContext context) 
@@ -81,25 +86,46 @@ class _CustomDrawerState extends State<CustomDrawer> with SingleTickerProviderSt
                 color: ruby,
                 child: Column(
                   children: <Widget>[
-                    // DrawerListTitle(),
-                    // Divider(color: Colors.grey, height: 40.0,),
+                    DrawerListTitle(
+                      onTap: currentIndex==8 ? null : () {
+                        setState(() {
+                          currentIndex=8;
+                        });
+                        onPressedIndex();
+                      },
+                      isSelected: currentIndex==8,
+                      title: 'كل الأذكار',
+                      pathIcon:
+                        currentIndex==8 ? 
+                        'assets/images/sections/8_128px.png'
+                        : 'assets/images/sections/8_white_108px.png',
+                      animationController: animationController,
+                    ),
+                    Divider(
+                      color: ruby[100].withAlpha(50),
+                      thickness: 2,
+                      height: 10.0,
+                      indent: 7.5,
+                      endIndent: 7.5,
+                    ),
                     Expanded(
                       child: ListView.builder(
                         itemCount: sectionsProvider.length,
                         itemBuilder: (context, index) {
                           return DrawerListTitle(
-                              onTap: () {
-                                setState(() {
-                                  currentSelectedIndex=index;
-                                });
-                              },
-                              isSelected: currentSelectedIndex==index,
-                              title: sectionsProvider.getSection(index).name,
-                              pathIcon:
-                                currentSelectedIndex==index ? 
-                                'assets/images/sections/'+sectionsProvider.getSection(index).id.toString()+'_128px.png'
-                                : 'assets/images/sections/'+sectionsProvider.getSection(index).id.toString()+'_white_128px.png',
-                              animationController: animationController,
+                            onTap: currentIndex==index ? null : () {
+                              setState(() {
+                                currentIndex=index;
+                              });
+                              onPressedIndex();
+                            },
+                            isSelected: currentIndex==index,
+                            title: sectionsProvider.getSection(index).name,
+                            pathIcon:
+                              currentIndex==index ? 
+                              'assets/images/sections/'+index.toString()+'_128px.png'
+                              : 'assets/images/sections/'+index.toString()+'_white_108px.png',
+                            animationController: animationController,
                           );
                         },
                       ),

@@ -1,4 +1,4 @@
-// import '../../pages/azkar/view_azkar.dart';
+import '../../providers/favorites_provider.dart';
 import '../../pages/azkar/view_azkar.dart';
 import '../../providers/azkar_provider.dart';
 import '../../models/category_model.dart';
@@ -19,14 +19,6 @@ class Category extends StatefulWidget
 
 class _CategoryState extends State<Category> 
 {
-  int onFavorite;
-
-  @override
-  void initState() 
-  {
-    super.initState();
-    onFavorite=widget._category.favorite;
-  }
 
   @override
   Widget build(BuildContext context) 
@@ -98,16 +90,20 @@ class _CategoryState extends State<Category>
         onTap: () async {
           print('You clicked on Favorite');
           setState(() {
-            onFavorite==1 ? onFavorite=0 : onFavorite=1;
+            widget._category.favorite==1 ? widget._category.setFavorite(0) : widget._category.setFavorite(1);
           });
-          await categoriesProvider.updateFavorite(onFavorite,widget._category.id);
+          await categoriesProvider.updateFavorite(widget._category.favorite,widget._category.id);
+          if(widget._category.favorite==1)
+            await Provider.of<FavoritesProvider>(context,listen: false).addFavorite(0,widget._category.id);
+          else if(widget._category.favorite==0)
+            await Provider.of<FavoritesProvider>(context,listen: false).deleteFavorite(0,widget._category.id);
         },
         child: Container(
           height: 45,
           width: 45,
           padding:  EdgeInsets.all(5.0),
           child: Image.asset(
-            onFavorite==1 ? 
+            widget._category.favorite==1 ? 
             'assets/images/icons/favorites/favorite_128px.png'
             : 'assets/images/icons/favorites/nonfavorite_128px.png' ,
             fit: BoxFit.contain,

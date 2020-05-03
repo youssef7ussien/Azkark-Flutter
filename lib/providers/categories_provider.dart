@@ -19,8 +19,9 @@ class CategoriesProvider with ChangeNotifier
     _categories[id].setFavorite(favorite);
     try
     {
-      await databaseHelper.uptadeFavorite(favorite,id);
+      await databaseHelper.updateFavoriteInTables('categories',favorite,id);
       print('uptadeFavorite : true');
+      notifyListeners();
       return true; 
     }
     catch(e)

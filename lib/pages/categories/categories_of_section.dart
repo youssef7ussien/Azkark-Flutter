@@ -1,6 +1,4 @@
-import 'package:azkark/models/section_model.dart';
-import 'package:azkark/widgets/Custom_drawer/custom_drawer.dart';
-
+import '../../widgets/Custom_drawer/custom_drawer.dart';
 import '../../utilities/background.dart';
 import '../../widgets/categories_widget/category.dart';
 import '../../providers/sections_provider.dart';
@@ -11,7 +9,7 @@ import 'package:flutter/material.dart';
 
 class CategoriesOfSection extends StatefulWidget
 {
-  int _sectionId;
+  final int _sectionId;
 
   CategoriesOfSection(this._sectionId);
 
@@ -23,6 +21,7 @@ class _CategoriesOfSectionState extends State<CategoriesOfSection> with SingleTi
 {
   bool isCollapsed;
   AnimationController animationController;
+  int currentIndex;
 
   @override
   void initState() 
@@ -33,6 +32,12 @@ class _CategoriesOfSectionState extends State<CategoriesOfSection> with SingleTi
       duration: Duration(milliseconds: 225)
     );
     isCollapsed=false;
+    currentIndex=widget._sectionId;
+  }
+
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -49,7 +54,7 @@ class _CategoriesOfSectionState extends State<CategoriesOfSection> with SingleTi
           appBar: AppBar(
             elevation: 0.0,
             title: Text(
-              sectionsProvider.getSection(widget._sectionId).name,
+              currentIndex==8 ?  'كل الأذكار' : sectionsProvider.getSection(currentIndex).name,
               style: new TextStyle(
                 color: ruby[50],
                 fontWeight: FontWeight.w700,
@@ -80,25 +85,10 @@ class _CategoriesOfSectionState extends State<CategoriesOfSection> with SingleTi
                   height: size.height,
                   child: Column(
                     children: <Widget>[
-                      // _buildTopBox(categoriesProvider,sectionsProvider.getCategoriesIndex(_sectionId).length,size),
                       Expanded(
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          physics: BouncingScrollPhysics(),
-                          itemCount: sectionsProvider.getCategoriesIndex(widget._sectionId).length,
-                          itemBuilder:  (context, index){
-                            return Padding(
-                              padding: index==0 ? 
-                                const EdgeInsets.only(top:5.0,left: 5.0,right: 5.0)
-                                : index==sectionsProvider.getCategoriesIndex(widget._sectionId).length-1 ?
-                                const EdgeInsets.only(bottom: 5.0,left: 5.0,right: 5.0)
-                                : const EdgeInsets.only(left: 5.0,right: 5.0),
-                              child: Category(
-                                categoriesProvider.getCategory(sectionsProvider.getCategoriesIndex(widget._sectionId)[index]),
-                              ),
-                            );
-                          }
-                        ),
+                        child: currentIndex==8 ? 
+                        _buildListViewAllCategories(categoriesProvider) 
+                        : _buildListViewCategoriesOfSection(sectionsProvider,categoriesProvider),
                       ),
                     ],
                   ),
@@ -109,19 +99,77 @@ class _CategoriesOfSectionState extends State<CategoriesOfSection> with SingleTi
                 child: CustomDrawer(
                   animationController: animationController,
                   minWidth: size.width*0.15,
-                  maxWidth: size.width*0.6,
+                  maxWidth: size.width*0.7,
                   onTap: (){
                     setState(() {
                       isCollapsed=!isCollapsed;
                       isCollapsed ? animationController.forward() : animationController.reverse();
                     });
-                  }
+                  },
+                  onSwipeLeft: (){
+                    setState(() {
+                      isCollapsed=!isCollapsed;
+                      isCollapsed ? animationController.forward() : animationController.reverse();
+                    });
+                  },
+                  onSwipeRight: (){
+                    setState(() {
+                      isCollapsed=!isCollapsed;
+                    });
+                  },
+                  currentIndex: currentIndex,
+                  onPressedIndex: (int index){
+                    setState(() {
+                      currentIndex=index;
+                    });
+                  },
                 ),
               ),
             ],
           ),
         ),
       ]
+    );
+  }
+
+  Widget _buildListViewAllCategories(CategoriesProvider categoriesProvider)
+  {
+    return ListView.builder(
+      physics: BouncingScrollPhysics(),
+      itemCount: categoriesProvider.length,
+      itemBuilder:  (context, index){
+        return Padding(
+          padding: index==0 ? 
+            const EdgeInsets.only(top:5.0,left: 5.0,right: 5.0)
+            : index==categoriesProvider.length-1 ?
+            const EdgeInsets.only(bottom: 5.0,left: 5.0,right: 5.0)
+            : const EdgeInsets.only(left: 5.0,right: 5.0),
+          child: Category(
+            categoriesProvider.getCategory(index),
+          ),
+        );
+      }
+    );
+  }
+
+  Widget _buildListViewCategoriesOfSection(SectionsProvider sectionsProvider,CategoriesProvider categoriesProvider)
+  {
+    return ListView.builder(
+      // shrinkWrap: true,
+      physics: BouncingScrollPhysics(),
+      itemCount: sectionsProvider.getCategoriesIndex(currentIndex).length,
+      itemBuilder:  (context, index){
+        return Padding(
+          padding: index==0 ? 
+            const EdgeInsets.only(top:5.0,left: 5.0,right: 5.0)
+            : index==sectionsProvider.getCategoriesIndex(currentIndex).length-1 ?
+            const EdgeInsets.only(bottom: 5.0,left: 5.0,right: 5.0)
+            : const EdgeInsets.only(left: 5.0,right: 5.0),
+          child: Category(
+            categoriesProvider.getCategory(sectionsProvider.getCategoriesIndex(currentIndex)[index]),
+          ),
+        );
+      }
     );
   }
 
