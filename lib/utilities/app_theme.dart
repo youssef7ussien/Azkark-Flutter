@@ -4,8 +4,8 @@ import 'colors.dart';
 class AppTheme
 {
   static ThemeData appTheme=ThemeData(
-    fontFamily: 'RB',
-    primaryColor: ruby,
-    scaffoldBackgroundColor: ruby10,
+    fontFamily: '0',
+    primarySwatch: ruby,
+    scaffoldBackgroundColor: Colors.transparent,
   );
 }

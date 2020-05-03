@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:azkark/models/favorite_model.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -71,12 +72,38 @@ class DatabaseHelper
     return result;
   }
 
-  Future<int> uptadeFavorite(int favorite,int id) async 
+  Future<int> updateFavoriteInTables(String tableName,int favorite,int id) async 
   {
     var dbClient=await database;
-    int result=await dbClient.rawUpdate('UPDATE categories SET favorite=$favorite WHERE id=$id');
-    
-    print('uptadeFavorite : $result');
+    int result=await dbClient.rawUpdate('UPDATE $tableName SET favorite=$favorite WHERE id=$id');
+
+    print('uptadeFavoriteIn $tableName : $result');
+    return result; 
+  }
+
+  Future<List<Map<String,dynamic>>> getAllFavorite(String tableName) async
+  {
+    var dbClient=await database;
+    List<Map<String,dynamic>> result=await dbClient.rawQuery('SELECT * FROM $tableName');
+
+    print('getAllFavorite done : ${result.length}');
+    return result;
+  }
+  
+  Future<int> addFavorite(String tableName,FavoriteModel favorite) async 
+  {
+    var dbClient=await database;
+    int result=await dbClient.insert(tableName,favorite.toMap());
+    print('addFavorite : $result');
+    return result; 
+  }
+  
+  Future<int> deleteFavorite(String tableName,int itemId) async 
+  {
+    var dbClient=await database;
+    int result=await dbClient.rawDelete('DELETE FROM $tableName WHERE item_id=$itemId');
+
+    print('deleteFavorite : $result');
     return result; 
   }
 
@@ -89,5 +116,40 @@ class DatabaseHelper
     return result;
   }
 
+  Future<List<Map<String,dynamic>>> getAllPrayer() async
+  {
+    var dbClient=await database;
+    List<Map<String,dynamic>> result=await dbClient.rawQuery('SELECT * FROM prayer');
 
+    print('getAllPrayer done : ${result.length}');
+    return result;
+  }
+  
+  Future<List<Map<String,dynamic>>> getAllAsmaAllah() async
+  {
+    var dbClient=await database;
+    List<Map<String,dynamic>> result=await dbClient.rawQuery('SELECT * FROM asmaallah');
+
+    print('getAllAsmaAllah done : ${result.length}');
+    return result;
+  }
+  
+  Future<List<Map<String,dynamic>>> getSettings() async
+  {
+    var dbClient=await database;
+    List<Map<String,dynamic>> result=await dbClient.rawQuery('SELECT * FROM settings');
+
+    print('getAllAsmaAllah done : ${result.length}');
+    return result;
+  }
+
+  Future<int> updateSettings(String nameField,dynamic value) async 
+  {
+    var dbClient=await database;
+    int result=await dbClient.rawUpdate('UPDATE settings SET $nameField=$value WHERE id=0');
+
+    print('updateSettings : $result');
+    return result; 
+  }
+  
 }

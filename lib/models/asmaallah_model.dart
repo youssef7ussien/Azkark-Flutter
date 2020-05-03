@@ -12,8 +12,14 @@ class AsmaAllahModel
 
   AsmaAllahModel.fromMap(Map<String,dynamic> map)
   {
-    map['id']=_id;
-    map['name']=_name;
-    map['description']=_description;
+    _id=map['id'];
+    _name=map['name'];
+    _description=map['description'];
   }
+
+  int get id => _id;
+  
+  String get name => _name;
+  
+  String get description => _description;
 }

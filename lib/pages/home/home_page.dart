@@ -1,7 +1,14 @@
+import '../../utilities/navigate_between_pages/scale_route.dart';
+import '../../utilities/navigate_between_pages/slide_route.dart';
+import '../../pages/settings/settings_page.dart';
+import '../../pages/asmaallah/view_asmaallah.dart';
+import '../../pages/prayer/view_prayer.dart';
+import '../../pages/categories/all_categories.dart';
+import '../../pages/favorites/view_favorites.dart';
+import '../../pages/sebha/items_sebha.dart';
+import '../../utilities/background.dart';
 import '../../models/section_model.dart';
 import '../categories/categories_of_section.dart';
-
-import '../../providers/categories_provider.dart';
 import '../../providers/sections_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,20 +20,18 @@ class HomePage extends StatelessWidget
   Widget build(BuildContext context) 
   {
     final size=MediaQuery.of(context).size;
-    final sectionProvider=Provider.of<SectionsProvider>(context,listen: false);
-    final categoriesProvider=Provider.of<CategoriesProvider>(context,listen: false);
+    final sectionsProvider=Provider.of<SectionsProvider>(context,listen: false);
 
     return Stack(
       children: <Widget>[
-        _buildBackgroundImage(size),
+        Background(),
         Scaffold(
-          backgroundColor: Colors.transparent,
           appBar: AppBar(
             elevation: 0.0,
             title: Text(
               'الصفحة الرئيسية',
               style: new TextStyle(
-                color: ruby10,
+                color: ruby[50],
                 fontWeight: FontWeight.w700,
                 fontSize: 18,
               ),
@@ -37,22 +42,35 @@ class HomePage extends StatelessWidget
               _buildSearchBar(size),
               Expanded(
                 child: SingleChildScrollView(
+                  physics: BouncingScrollPhysics(),
                   child: Column(
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      Container(
+                        height: size.height*0.25,
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
                           children: <Widget>[
-                            _buildItemsCard(size,'أسماء الله الحسني','assets/images/icons/favorites/icons-01-256px.png'),
-                            _buildItemsCard(size,'المسبحة','assets/images/icons/sebha/sebha-128px.png'),
-                            _buildItemsCard(size,'المفضلة','assets/images/icons/favorites/icons-02-256px.png'),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: _buildItemsCard(size,'المفضلة','assets/images/icons/favorites/favorite_256px.png',context),
+                            ),
+                          _buildItemsCard(size,'المسبحة الإلكترونية','assets/images/icons/sebha/sebha_256px.png',context),
+                            _buildItemsCard(size,'دعاء من القرآن','assets/images/icons/prayer/prayer_256px.png',context),
+                          _buildItemsCard(size,'أسماء الله الحسني','assets/images/icons/asmaallah/allah_256px.png',context),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: _buildItemsCard(size,'الضبط','0',context),
+                            ),
                           ],
                         ),
                       ),
-                      for(int i=0 ; i<sectionProvider.length ; i+=2)
-                        _buildRowCategories(categoriesProvider,size,sectionProvider,i,context),
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: _buildAllAzkarCard(size,'عرض كل الأذكار',context),
+                      ),
+                      for(int i=0 ; i<sectionsProvider.length ; i+=2)
+                        _buildRowCategories(sectionsProvider,size,i,context),
                     ],
                   ),
                 ),
@@ -61,19 +79,6 @@ class HomePage extends StatelessWidget
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildBackgroundImage(Size size)
-  {
-    return Container(
-      color: ruby10,
-      child: Image.asset(
-        'assets/images/background/background.png',
-        color: Color(0x1044000D),
-        fit: BoxFit.cover,
-        height: size.height,
-      ),
     );
   }
 
@@ -97,21 +102,21 @@ class HomePage extends StatelessWidget
           padding: const EdgeInsets.only(left: 10.0, right: 10.0),
           height: size.height*0.055,
           decoration: BoxDecoration(
-            color: ruby80,
+            color: ruby[700],
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             children: <Widget>[
               Icon(
                 Icons.search,
-                color: ruby10,
+                color: ruby[50],
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 10.0),
                 child: Text(
                   'إبحث عن ذكر . . . ',
                   style: TextStyle(
-                    color: ruby30,
+                    color: ruby[300],
                     fontSize: 13,
                   ),
                 ),
@@ -123,26 +128,46 @@ class HomePage extends StatelessWidget
     );
   }
 
-  Widget _buildItemsCard(Size size,String text,String pathIcon)
+  Widget _buildItemsCard(Size size,String text,String pathIcon,BuildContext context)
   {
     return Column(
       children: <Widget>[
         Card(
-          color: ruby30,
+          color: ruby[300],
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10)
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
+          child: InkWell(
+            highlightColor: ruby[400],
+            borderRadius: BorderRadius.circular(10),
+            onTap: (){
+              print('You Clicked on $text');
+              if(text=='المسبحة الإلكترونية')
+                Navigator.push(context,ScaleRoute(page: ItemsSebha()),);
+
+              else if(text=='المفضلة')
+                Navigator.push(context,ScaleRoute(page: FavoritesView()),);
+
+              else if(text=='دعاء من القرآن')
+                Navigator.push(context,ScaleRoute(page: ViewPrayer()),);
+
+              else if(text=='أسماء الله الحسني')
+                Navigator.push(context,ScaleRoute(page: ViewAsmaAllah()),);
+
+              else if(text=='الضبط')
+                Navigator.push(context,ScaleRoute(page: Settings()),);
+            },
             child: Container(
-              padding:  EdgeInsets.all(5.0),
+              margin: const EdgeInsets.all(10.0),
               height: size.height*0.1,
               width: size.width*0.15,
-              child: Image.asset(
+              child: pathIcon=='0' ? Icon(
+                Icons.settings,
+                color: ruby[700],
+                size: size.width*0.12,
+              ) : Image.asset(
                 pathIcon,
-                // color: Color(0x1044000D),
                 fit: BoxFit.contain,
-                height: size.height,
               ),
             ),
           ),
@@ -163,7 +188,51 @@ class HomePage extends StatelessWidget
     );
   }
 
-  Widget _buildRowCategories(CategoriesProvider categoriesProvider,Size size,SectionsProvider sectionsProvider,int index,BuildContext context)
+  Widget _buildAllAzkarCard(Size size,String text,BuildContext context)
+  {
+    return Card(
+      color: ruby[300],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10)
+      ),
+      child: InkWell(
+        highlightColor: ruby[400],
+        borderRadius: BorderRadius.circular(10),
+        onTap: (){
+          Navigator.push(context,SlideRightRoute(page: ViewAllCategories()));
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0,vertical: 10.0),
+          child: Row(
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.only(right: 5.0),
+                height: size.height*0.06,
+                child: Image.asset(
+                  'assets/images/sections/8_128px.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.0),
+                child: Text(
+                  text,
+                  textAlign: TextAlign.center,
+                  style: new TextStyle(
+                    color: ruby,
+                    fontWeight: FontWeight.w700,
+                    fontSize: size.width*0.05,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRowCategories(SectionsProvider sectionsProvider,Size size,int index,BuildContext context)
   {
     return Padding(
       padding: const EdgeInsets.only(bottom: 5.0),
@@ -172,17 +241,13 @@ class HomePage extends StatelessWidget
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           _buildCategoryCard(
-            categoriesProvider,
             size,
             sectionsProvider.getSection(index),
-            'assets/images/sections/'+sectionsProvider.getSection(index).id.toString()+'.png',
             context
           ),
           _buildCategoryCard(
-            categoriesProvider,
             size,
             sectionsProvider.getSection(index+1),
-            'assets/images/sections/'+sectionsProvider.getSection(index+1).id.toString()+'.png',
             context
           ),
         ],
@@ -191,10 +256,10 @@ class HomePage extends StatelessWidget
   }
   
 
-  Widget _buildCategoryCard(CategoriesProvider categoriesProvider,Size size,SectionModel sectionModel,String pathIcon,BuildContext context)
+  Widget _buildCategoryCard(Size size,SectionModel sectionModel,BuildContext context)
   {
     return Card(
-      color: ruby30,
+      color: ruby[300],
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10)
       ),
@@ -202,18 +267,11 @@ class HomePage extends StatelessWidget
         height: size.height*0.25,
         width: size.width*0.45,
         child: InkWell(
-          highlightColor: ruby40,
+          highlightColor: ruby[400],
           borderRadius: BorderRadius.circular(10),
           onTap: (){
-            print(categoriesProvider.getCategoriesOfSection(sectionModel.id).length);
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) {
-                return Directionality( // add this
-                  textDirection: TextDirection.rtl,
-                  child : CategoriesOfSection(categoriesProvider.getCategoriesOfSection(sectionModel.id),sectionModel.id)
-                );
-              }),
-            );
+            print(sectionModel.categoriesIndex.length);
+            Navigator.push(context,SlideRightRoute(page: CategoriesOfSection(sectionModel.id)),);
           },
           child: Padding(
             padding: const EdgeInsets.all(10.0),
@@ -225,7 +283,7 @@ class HomePage extends StatelessWidget
                     // height: size.height*0.15,
                     width: size.width*0.4,
                     child: Image.asset(
-                      pathIcon,
+                      'assets/images/sections/'+sectionModel.id.toString()+'.png',
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -236,7 +294,7 @@ class HomePage extends StatelessWidget
                   style: new TextStyle(
                     color: ruby,
                     fontWeight: FontWeight.w700,
-                    fontSize: 13,
+                    fontSize: 14,
                   ),
                 ),
               ],
@@ -246,4 +304,5 @@ class HomePage extends StatelessWidget
       ),
     );
   }
+
 }
