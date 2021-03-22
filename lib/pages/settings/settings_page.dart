@@ -1,34 +1,22 @@
+import 'package:azkark/util/helpers.dart';
+import '../../util/background.dart';
 import '../../widgets/settings_widget/setting_font_size.dart';
 import '../../widgets/settings_widget/setting_font_type.dart';
 import '../../widgets/settings_widget/settings_item.dart';
 import 'package:flutter/cupertino.dart';
-import '../../utilities/colors.dart';
+import '../../util/colors.dart';
 import 'package:flutter/material.dart';
 
-class Settings extends StatefulWidget 
+class Settings extends StatelessWidget 
 {
 
-  @override
-  _SettingsState createState() => _SettingsState();
-}
-
-class _SettingsState extends State<Settings> 
-{
-  @override
-  void initState() {
-    super.initState();
-
-  }
   @override
   Widget build(BuildContext context) 
   {
-    final size=MediaQuery.of(context).size;
-
     return Stack(
       children: <Widget>[
-        // Background(),
+        Background(),
         Scaffold(
-          backgroundColor: ruby[50],
           appBar: AppBar(
             elevation: 0.0,
             title: Text(
@@ -44,8 +32,9 @@ class _SettingsState extends State<Settings>
             physics: BouncingScrollPhysics(),
             child: Column(
               children: <Widget>[
-                _buildPublicSettings(size),
-                _buildAzkarSettingsCard(size),
+                _buildPublicSettings(),
+                _buildAzkarSettingsCard(context),
+                // _buildCommunicate(size)
               ],
             ),
           ),
@@ -54,68 +43,49 @@ class _SettingsState extends State<Settings>
     );
   }
 
-  Widget _buildAzkarSettingsCard(Size size)
+  BoxDecoration _decoration()
   {
-    return Container(
-      // height: size.height*0.5,
-      margin: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 8.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-      ),
+    return BoxDecoration(
+        color: ruby[50],
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(20),
+          topLeft: Radius.circular(20)
+        ),
+        border: Border.all(color: ruby[600]),
+    );
+  }
+
+  Widget _buildAzkarSettingsCard(BuildContext context)
+  {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 8.0),
       child: Column(
         children: <Widget>[
           Align(
             alignment: Alignment.topRight,
-            child: Container(
-              decoration: BoxDecoration(
-                color: ruby[600],
-                // borderRadius: BorderRadius.circular(20),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0,vertical: 5.0),
-                child: Text(
-                  'إعدادات الأذكار',
-                  style: new TextStyle(
-                    color: ruby[50],
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ),
+            child: _buildTitle('إعدادات الأذكار'),
           ),
           Container(
-            decoration: BoxDecoration(
-                color: Colors.transparent,
-                // borderRadius: BorderRadius.circular(20),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                  topLeft: Radius.circular(20)
-                ),
-                border: Border.all(color: ruby[600]),
-            ),
+            decoration: _decoration(),
             child: Column(
               children: <Widget>[
                 SettingsItem(
-                  activeTitle: 'تم تشغيل العداد',
-                  inactiveTitle: 'تشغيل العداد',
+                  activeTitle: translate(context,'popup_menu_counter_true'),
+                  inactiveTitle: translate(context,'popup_menu_counter_false'),
                   nameField: 'counter',
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20)
                   ),
                 ),
                 SettingsItem(
-                  activeTitle: 'تم وضع التشكيل',
-                  inactiveTitle: 'وضع التشكيل',
+                  activeTitle: translate(context,'popup_menu_diacritics_true'),
+                  inactiveTitle: translate(context,'popup_menu_diacritics_false'),
                   nameField: 'diacritics',
                 ),
                 SettingsItem(
-                  activeTitle: 'تم عرض السند',
-                  inactiveTitle: 'عرض السند',
+                  activeTitle: translate(context,'popup_menu_sanad_true'),
+                  inactiveTitle: translate(context,'popup_menu_sanad_false'),
                   nameField: 'sanad',
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(20),
@@ -130,7 +100,7 @@ class _SettingsState extends State<Settings>
     );
   }
   
-  Widget _buildPublicSettings(Size size)
+  Widget _buildPublicSettings()
   {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 8.0),
@@ -141,36 +111,10 @@ class _SettingsState extends State<Settings>
         children: <Widget>[
           Align(
             alignment: Alignment.topRight,
-            child: Container(
-              decoration: BoxDecoration(
-                color: ruby[600],
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0,vertical: 5.0),
-                child: Text(
-                  'الإعدادات العامة',
-                  style: new TextStyle(
-                    color: ruby[50],
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ),
+            child: _buildTitle('الإعدادات العامة'),
           ),
           Container(
-            decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                  topLeft: Radius.circular(20)
-                ),
-                border: Border.all(color: ruby[600]),
-            ),
+            decoration: _decoration(),
             child: Column(
               children: <Widget>[
                 SettingFontType(
@@ -188,6 +132,57 @@ class _SettingsState extends State<Settings>
             ),
           ),
         ],
+      ),
+    );
+  }
+  
+  // Widget _buildCommunicate(Size size)
+  // {
+  //   return Container(
+  //     margin: const EdgeInsets.symmetric(horizontal: 8.0,vertical: 8.0),
+  //     decoration: BoxDecoration(
+  //       borderRadius: BorderRadius.circular(10),
+  //     ),
+  //     child: Column(
+  //       children: <Widget>[
+  //         Align(
+  //           alignment: Alignment.topRight,
+  //           child:  _buildTitle('للتواصل و الإقتراحات'),
+  //         ),
+  //         Container(
+  //           decoration: _decoration(),
+  //           child: Column(
+  //             children: <Widget>[
+  //               Icon(
+  //                 Icons.email,
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  Widget _buildTitle(String text)
+  {
+    return Container(
+      decoration: BoxDecoration(
+        color: ruby[600],
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15.0,vertical: 5.0),
+        child: Text(
+          text,
+          style: new TextStyle(
+            color: ruby[50],
+            fontSize: 14,
+          ),
+        ),
       ),
     );
   }

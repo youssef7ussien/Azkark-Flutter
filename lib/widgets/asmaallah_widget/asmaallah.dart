@@ -1,5 +1,5 @@
 import '../../models/asmaallah_model.dart';
-import '../../utilities/colors.dart';
+import '../../util/colors.dart';
 import 'package:flutter/material.dart';
 
 class AsmaAllah extends StatefulWidget 
@@ -21,14 +21,12 @@ class AsmaAllah extends StatefulWidget
 
 class _AsmaAllahState extends State<AsmaAllah> 
 {
-  bool showDescription;
+  bool _showDescription;
   @override
-  void initState() 
-  {
+  void initState() {
+    _showDescription=widget.showDescription;
     super.initState();
-    showDescription=false;
   }
-
   @override
   Widget build(BuildContext context) 
   {
@@ -45,7 +43,11 @@ class _AsmaAllahState extends State<AsmaAllah>
           highlightColor: Colors.transparent,
           splashColor: ruby[100],
           borderRadius: BorderRadius.circular(10),
-          onTap: widget.onTap,
+          onTap: widget.onTap==null ? (){
+            setState(() {
+              _showDescription=!_showDescription;
+            });
+          } : widget.onTap,
           child: Stack(
             children: <Widget>[
               Align(

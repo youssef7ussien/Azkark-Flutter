@@ -1,8 +1,8 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../utilities/colors.dart';
+import '../../util/colors.dart';
 import 'package:flutter/material.dart';
 
-class ButtonFontSize extends StatefulWidget 
+class ButtonFontSize extends StatelessWidget 
 {
   final bool showSider;
   final Function onTap;
@@ -13,12 +13,6 @@ class ButtonFontSize extends StatefulWidget
   });
 
   @override
-  _ButtonFontSizeState createState() => _ButtonFontSizeState();
-}
-
-class _ButtonFontSizeState extends State<ButtonFontSize> 
-{
-  @override
   Widget build(BuildContext context) {
     return IconButton(
       tooltip: 'تغيير حجم الخط',
@@ -28,16 +22,16 @@ class _ButtonFontSizeState extends State<ButtonFontSize>
       icon: Container(
         padding: EdgeInsets.only(top: 2.5,bottom: 2.5,left: 5.0,right: 5.0),
         decoration: BoxDecoration(
-          color: widget.showSider ? ruby[50] : Colors.transparent,
+          color: showSider ? ruby[50] : Colors.transparent,
           borderRadius: BorderRadius.circular(10)
         ),
         child: FaIcon(
           FontAwesomeIcons.font,
-          color: widget.showSider ? ruby[800] : ruby[50],
+          color: showSider ? ruby[800] : ruby[50],
           size: 20,
         ),
       ),
-      onPressed: widget.onTap,
+      onPressed: onTap,
     );
   }
 }

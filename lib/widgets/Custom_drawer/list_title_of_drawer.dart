@@ -1,4 +1,4 @@
-import '../../utilities/colors.dart';
+import '../../util/colors.dart';
 import 'package:flutter/material.dart';
 
 class DrawerListTitle extends StatefulWidget 
@@ -29,7 +29,7 @@ class _DrawerListTitleState extends State<DrawerListTitle>
     super.initState();
     fontSizeAnimation=Tween<double>(
       begin: 0, 
-      end: 14
+      end: 16
     ).animate(widget.animationController);
   }
 

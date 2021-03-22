@@ -1,20 +1,17 @@
-import 'package:azkark/providers/prayer_provider.dart';
-import 'package:azkark/widgets/prayer_widget/prayer.dart';
+import '../../providers/prayer_provider.dart';
+import '../../util/helpers.dart';
+import '../../widgets/prayer_widget/prayer.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../utilities/colors.dart';
-import '../../widgets/prayer_widget/tab_bar.dart';
+import '../../util/colors.dart';
 import '../../providers/settings_provider.dart';
 import '../../widgets/slider_font_size/button_font_size.dart';
 import '../../widgets/slider_font_size/slider_font_size.dart';
-import '../../pages/prayer/view_surah_prayer.dart';
 import 'package:provider/provider.dart';
-import '../../utilities/background.dart';
+import '../../util/background.dart';
 import 'package:flutter/material.dart';
-import 'view_aya_prayer.dart';
 
 class ViewPrayer extends StatefulWidget 
 {
-
   @override
   _ViewPrayerState createState() => _ViewPrayerState();
 }
@@ -57,7 +54,7 @@ class _ViewPrayerState extends State<ViewPrayer> with SingleTickerProviderStateM
           appBar: AppBar(
             elevation: 0.0,
             title: Text(
-              'دعاء من القرآن',
+              translate(context,'prayer_bar'),
               style: new TextStyle(
                 color: ruby[50],
                 fontWeight: FontWeight.w700,
@@ -135,18 +132,19 @@ class _ViewPrayerState extends State<ViewPrayer> with SingleTickerProviderStateM
       padding: const EdgeInsets.only(left: 5.0),
       child: PopupMenuButton<PopUpMenu>(
         offset: Offset(0,50),
-        tooltip: 'قائمة الخيارات',
+        tooltip: translate(context,'popup_menu'),
         onSelected:(PopUpMenu result) async {
           switch(result)
           {
-            
-            
             case PopUpMenu.ShowAllAyat:
             {
               setState(() {
                 _showAllAyat=!_showAllAyat;
-                for(int i=0; i<Provider.of<PrayerProvider>(context,listen: false).allSurah.length ; i++)
-                _showAllAyat ? _showAlAyat[i]=true : _showAlAyat[i]=false;
+                _showAlAyat.fillRange(
+                  0, 
+                  Provider.of<PrayerProvider>(context,listen: false).allSurah.length,
+                  _showAllAyat
+                );
               });
             } break;
           }
@@ -158,23 +156,23 @@ class _ViewPrayerState extends State<ViewPrayer> with SingleTickerProviderStateM
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  FaIcon(
-                    _showAllAyat ? FontAwesomeIcons.toggleOn : FontAwesomeIcons.toggleOff,
-                    color: _showAllAyat ? ruby[500] : ruby,
-                    size: 20,
-                  ),
                   Container(
                     width: 150,
                     alignment: Alignment.centerRight,
                     child: Text(
-                      _showAllAyat ? 'تم عرض معاني كل الأسماء' : 'عرض معاني كل الأسماء',
-                      textAlign: TextAlign.right,
+                      _showAllAyat ? translate(context,'popup_menu_aya_true') 
+                                    : translate(context,'popup_menu_aya_false'),
                       style: new TextStyle(
                         color: ruby[900],
                         fontWeight: FontWeight.w300,
                         fontSize: 14,
                       ),  
                     ),
+                  ),
+                  FaIcon(
+                    _showAllAyat ? FontAwesomeIcons.toggleOn : FontAwesomeIcons.toggleOff,
+                    color: _showAllAyat ? ruby[500] : ruby,
+                    size: 20,
                   ),
                 ],
               ),

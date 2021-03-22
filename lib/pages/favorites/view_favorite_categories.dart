@@ -1,11 +1,13 @@
-import '../../widgets/favorites_widget/empty_favorite.dart';
-import '../../utilities/colors.dart';
+import 'package:azkark/util/helpers.dart';
+import '../../util/colors.dart';
 import '../../widgets/categories_widget/category.dart';
 import '../../providers/favorites_provider.dart';
 import '../../providers/categories_provider.dart';
 import 'package:provider/provider.dart';
-import '../../utilities/background.dart';
+import '../../util/background.dart';
 import 'package:flutter/material.dart';
+
+import 'components/empty_favorite.dart';
 
 class ViewFavoriteCategories extends StatefulWidget 
 {
@@ -19,7 +21,6 @@ class _ViewFavoriteCategoriesState extends State<ViewFavoriteCategories>
   @override
   Widget build(BuildContext context) 
   {
-    final size=MediaQuery.of(context).size;
     final categoriesProvider=Provider.of<CategoriesProvider>(context,listen: false);
     final favoritesProvider=Provider.of<FavoritesProvider>(context,listen: false);
 
@@ -30,7 +31,7 @@ class _ViewFavoriteCategoriesState extends State<ViewFavoriteCategories>
           appBar: AppBar(
             elevation: 0.0,
             title: Text(
-              'المفضلة',
+              translate(context,'favorite_bar'),
               style: new TextStyle(
                 color: ruby[50],
                 fontWeight: FontWeight.w700,

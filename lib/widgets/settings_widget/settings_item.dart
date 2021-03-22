@@ -1,6 +1,6 @@
 import '../../providers/settings_provider.dart';
 import 'package:provider/provider.dart';
-import '../../utilities/colors.dart';
+import '../../util/colors.dart';
 import 'package:flutter/material.dart';
 
 class SettingsItem extends StatefulWidget 

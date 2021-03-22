@@ -1,11 +1,13 @@
+import '../../util/helpers.dart';
 import '../../widgets/Custom_drawer/custom_drawer.dart';
-import '../../utilities/background.dart';
+import '../../util/background.dart';
 import '../../widgets/categories_widget/category.dart';
 import '../../providers/sections_provider.dart';
 import '../../providers/categories_provider.dart';
 import 'package:provider/provider.dart';
-import '../../utilities/colors.dart';
 import 'package:flutter/material.dart';
+
+import 'components/app_bar.dart';
 
 class CategoriesOfSection extends StatefulWidget
 {
@@ -19,25 +21,46 @@ class CategoriesOfSection extends StatefulWidget
 
 class _CategoriesOfSectionState extends State<CategoriesOfSection> with SingleTickerProviderStateMixin 
 {
-  bool isCollapsed;
-  AnimationController animationController;
-  int currentIndex;
+  bool _isCollapsed;
+  AnimationController _animationController;
+  int _currentIndex;
 
   @override
   void initState() 
   {
     super.initState();
-    animationController=AnimationController(
+    _animationController=AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 225)
     );
-    isCollapsed=false;
-    currentIndex=widget._sectionId;
+    _isCollapsed=false;
+    _currentIndex=widget._sectionId;
   }
 
   void dispose() {
-    animationController.dispose();
+    _animationController.dispose();
     super.dispose();
+  }
+
+  String get title => _currentIndex==8 ?  translate(context,'all_categories') 
+                    : Provider.of<SectionsProvider>(context,listen: false).getSection(_currentIndex).name;
+
+  void onTapDrawer()
+  {
+    setState(() {
+      _isCollapsed=!_isCollapsed;
+      _isCollapsed ? _animationController.forward() : _animationController.reverse();
+    });
+  }
+
+  Future<bool> _onBackPressed() 
+  {
+    print('back');
+    if(!_isCollapsed)
+      return Future.value(true);
+    
+    onTapDrawer();
+    return Future.value(false);
   }
 
   @override
@@ -50,82 +73,49 @@ class _CategoriesOfSectionState extends State<CategoriesOfSection> with SingleTi
     return Stack(
       children: <Widget>[
         Background(),
-        Scaffold(
-          appBar: AppBar(
-            elevation: 0.0,
-            title: Text(
-              currentIndex==8 ?  'كل الأذكار' : sectionsProvider.getSection(currentIndex).name,
-              style: new TextStyle(
-                color: ruby[50],
-                fontWeight: FontWeight.w700,
-                fontSize: 16,
-              ),
+        WillPopScope(
+          onWillPop: _onBackPressed,
+          child: Scaffold(
+            appBar: CustomAppBar(
+              animationController: _animationController,
+              title: title,
+              onTap: onTapDrawer,
             ),
-            actions: <Widget>[
-              Container(
-                margin: const EdgeInsets.all(4.0),
-                child: IconButton(
-                  color: ruby[50],
-                  highlightColor: ruby[700],
-                  splashColor: ruby[700],
-                  padding: EdgeInsets.all(0.0),
-                  icon: Icon(Icons.search),
-                  onPressed: (){}
-                ),
-              ),
-              _buildMenuButton(),
-            ],
-          ),
-          body: Stack(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.topRight,
-                child: Container(
-                  width: size.width*0.85,
-                  height: size.height,
-                  child: Column(
-                    children: <Widget>[
-                      Expanded(
-                        child: currentIndex==8 ? 
-                        _buildListViewAllCategories(categoriesProvider) 
-                        : _buildListViewCategoriesOfSection(sectionsProvider,categoriesProvider),
-                      ),
-                    ],
+            body: Stack(
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Container(
+                    width: size.width*0.85,
+                    height: size.height,
+                    child: Column(
+                      children: <Widget>[
+                        Expanded(
+                          child: _currentIndex==8 ? 
+                          _buildListViewAllCategories(categoriesProvider) 
+                          : _buildListViewCategoriesOfSection(sectionsProvider,categoriesProvider),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Align(
-                alignment: Alignment.topLeft,
-                child: CustomDrawer(
-                  animationController: animationController,
-                  minWidth: size.width*0.15,
-                  maxWidth: size.width*0.7,
-                  onTap: (){
-                    setState(() {
-                      isCollapsed=!isCollapsed;
-                      isCollapsed ? animationController.forward() : animationController.reverse();
-                    });
-                  },
-                  onSwipeLeft: (){
-                    setState(() {
-                      isCollapsed=!isCollapsed;
-                      isCollapsed ? animationController.forward() : animationController.reverse();
-                    });
-                  },
-                  onSwipeRight: (){
-                    setState(() {
-                      isCollapsed=!isCollapsed;
-                    });
-                  },
-                  currentIndex: currentIndex,
-                  onPressedIndex: (int index){
-                    setState(() {
-                      currentIndex=index;
-                    });
-                  },
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: CustomDrawer(
+                    animationController: _animationController,
+                    minWidth: size.width*0.15,
+                    maxWidth: size.width*0.7,
+                    currentIndex: _currentIndex,
+                    onTap: onTapDrawer,
+                    onPressedIndex: (int index){
+                      setState(() {
+                        _currentIndex=index;
+                      });
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ]
@@ -157,41 +147,19 @@ class _CategoriesOfSectionState extends State<CategoriesOfSection> with SingleTi
     return ListView.builder(
       // shrinkWrap: true,
       physics: BouncingScrollPhysics(),
-      itemCount: sectionsProvider.getCategoriesIndex(currentIndex).length,
+      itemCount: sectionsProvider.getCategoriesIndex(_currentIndex).length,
       itemBuilder:  (context, index){
         return Padding(
           padding: index==0 ? 
             const EdgeInsets.only(top:5.0,left: 5.0,right: 5.0)
-            : index==sectionsProvider.getCategoriesIndex(currentIndex).length-1 ?
+            : index==sectionsProvider.getCategoriesIndex(_currentIndex).length-1 ?
             const EdgeInsets.only(bottom: 5.0,left: 5.0,right: 5.0)
             : const EdgeInsets.only(left: 5.0,right: 5.0),
           child: Category(
-            categoriesProvider.getCategory(sectionsProvider.getCategoriesIndex(currentIndex)[index]),
+            categoriesProvider.getCategory(sectionsProvider.getCategoriesIndex(_currentIndex)[index]),
           ),
         );
       }
-    );
-  }
-
-  Widget _buildMenuButton()
-  {
-    return Padding(
-      padding: EdgeInsets.only(left:5.0),
-      child: IconButton(
-        highlightColor: ruby[700],
-        splashColor: ruby[700],
-        onPressed: () {
-          setState(() {
-            isCollapsed=!isCollapsed;
-            isCollapsed ? animationController.forward() : animationController.reverse();
-          });
-        },
-        icon: AnimatedIcon(
-          icon: AnimatedIcons.menu_close,
-          progress: animationController,
-          color: ruby[50],
-        ),
-      ),
     );
   }
 

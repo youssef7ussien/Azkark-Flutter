@@ -9,6 +9,8 @@ class Background extends StatelessWidget
 
     return Container(
       color: Colors.white,
+      height: size.height,
+      width: size.width,
       child: Image.asset(
         'assets/images/background/background.png',
         color: Color(0x1044000D),

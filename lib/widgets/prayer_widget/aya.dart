@@ -1,9 +1,8 @@
-import 'package:flutter/services.dart';
-
+import '../../util/helpers.dart';
 import '../../providers/favorites_provider.dart';
 import '../../providers/prayer_provider.dart';
 import '../../models/prayer_model.dart';
-import '../../utilities/colors.dart';
+import '../../util/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,6 +23,11 @@ class Aya extends StatefulWidget
 class _AyaState extends State<Aya> 
 {
 
+  
+
+  String get text => 'بسم الله الرحمن الرحيم \n ﴿ ${widget.prayer.aya} ﴾ \n***********\nسورة : '
+      +widget.prayer.surah+'\n***********\nالأية : ${widget.prayer.ayaNumber}';
+
   @override
   Widget build(BuildContext context) 
   {
@@ -40,9 +44,7 @@ class _AyaState extends State<Aya>
           highlightColor: Colors.transparent,
           splashColor: ruby[100],
           borderRadius: BorderRadius.circular(10),
-          onLongPress: (){
-            copyText();
-          },
+          onLongPress: () => copyText(context, text),
           child: Column(
             children: <Widget>[
               Align(
@@ -54,7 +56,7 @@ class _AyaState extends State<Aya>
                 child: _buildBesmellahField(size)
               ),
               _buildAyaField(),
-              _buildBottomWidget(size),
+              _buildBottomWidget(),
             ],
           ),
         ),
@@ -62,32 +64,10 @@ class _AyaState extends State<Aya>
     );
   }
 
-  void copyText()
-  {
-    String tempText = 
-      widget.prayer.aya;
-    tempText+='\n***********\nسورة :\n'+widget.prayer.surah+'\n***********\nالأية :\n ${widget.prayer.ayaNumber}';
-    
-    Clipboard.setData(ClipboardData(text: tempText));
-
-    Scaffold.of(context).showSnackBar(SnackBar(
-      content: Text(
-          'تم النسخ إلي الحافظة',
-          style: new TextStyle(
-          color: ruby[100],
-          fontFamily: '0',
-          fontSize: 14,
-        ),
-      ),
-      backgroundColor: ruby,
-      duration: Duration(milliseconds: 500),
-    ));
-  }
-
   Widget _buildBesmellahField(Size size)
   {
     return Image.asset(
-      'assets/images/al_basmalla.png',
+      'assets/images/icons/prayer/al_basmalla.png',
       fit: BoxFit.contain,
       height: size.width*0.065,
     );
@@ -98,7 +78,7 @@ class _AyaState extends State<Aya>
     return Padding(
       padding: const EdgeInsets.only(top: 10.0,bottom: 15.0,right: 10.0,left: 10.0),
       child: Text(
-        widget.prayer.aya,
+        '﴿ ${widget.prayer.aya} ﴾',
         style: new TextStyle(
           color: ruby,
           fontFamily: '3',
@@ -145,10 +125,10 @@ class _AyaState extends State<Aya>
     );
   }
 
-  Widget _buildBottomWidget(Size size)
+  Widget _buildBottomWidget()
   {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.0,vertical: 5.0),
+      padding: EdgeInsets.symmetric(horizontal: 12.0,vertical: 5.0),
       decoration: BoxDecoration(
         color: ruby[600],
         borderRadius: BorderRadius.only(
@@ -159,14 +139,14 @@ class _AyaState extends State<Aya>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          _buildNameSurahField(size),
-          _buildAyaNumberField(size),
+          _buildNameSurahField(),
+          _buildAyaNumberField(),
         ],
       ),
     );
   }
 
-  Widget _buildNameSurahField(Size szie)
+  Widget _buildNameSurahField()
   {
     return Text(
       'سورة ${widget.prayer.surah}',
@@ -177,7 +157,7 @@ class _AyaState extends State<Aya>
     );
   }
   
-  Widget _buildAyaNumberField(Size szie)
+  Widget _buildAyaNumberField()
   {
     return Text(
       'الآية ${widget.prayer.ayaNumber}',
@@ -189,49 +169,3 @@ class _AyaState extends State<Aya>
   }
 
 }
-
-
-// class CardPainter extends CustomPainter 
-// {
-
-//   @override
-//   void paint(Canvas canvas, Size size) 
-//   {
-//     Paint paint=Paint();
-//     paint.color=ruby[500];
-//     paint.style=PaintingStyle.fill;
-
-//     Path path=Path();
-
-//     path.moveTo(0, size.height*0.2);
-//     path.quadraticBezierTo(size.width*0.2, size.height*0.05, size.width*0.5,size.height*0.25);
-//     path.quadraticBezierTo(size.width*0.75, size.height*0.42,size.width, size.height*0.25);
-//     path.lineTo(size.width, 0);
-//     path.lineTo(0, 0);
-//     path.close();
-//     canvas.drawPath(path, paint);
-    
-//     path=Path();
-//     path.moveTo(size.width*0.43, size.height*0.18);
-//     // path.quadraticBezierTo(size.width*0.2, size.height*0.03, size.width*0.5,size.height*0.25);
-//     path.quadraticBezierTo(size.width*0.73, size.height*0.42,size.width, size.height*0.23);
-//     path.lineTo(size.width, size.height*0.18);
-//     path.lineTo(size.width*0.5, size.height*0.18);
-//     path.close();
-//     paint.color=ruby[400];
-//     canvas.drawPath(path, paint);
-
-//     path=Path();
-//     path.moveTo(0,size.height*0.22);
-//     path.quadraticBezierTo(size.width*0.2, size.height*0.07,size.width*0.5, size.height*0.27);
-//     path.quadraticBezierTo(size.width*0.75, size.height*0.44,size.width, size.height*0.27);
-//     path.lineTo(size.width,size.height);
-//     path.lineTo(0,size.height);
-//     path.close();
-//     paint.color=ruby[500];
-//     canvas.drawPath(path, paint);
-//   }
-
-//   @override
-//   bool shouldRepaint(CardPainter oldDelegate) => false;
-// }

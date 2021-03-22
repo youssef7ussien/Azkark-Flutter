@@ -8,6 +8,8 @@ class PrayerProvider with ChangeNotifier
   Map<String,List<int>> _prayerGuide=Map<String,List<int>>();
   DatabaseHelper databaseHelper=new DatabaseHelper();
 
+  String get table => 'prayer';
+
   int get length => _prayer.length;
 
   List<String> get allSurah => _prayerGuide.keys.toList();
@@ -47,7 +49,7 @@ class PrayerProvider with ChangeNotifier
   {
     try
     {
-      List<Map<String,dynamic>> tempPrayer=await databaseHelper.getAllPrayer();
+      List<Map<String,dynamic>> tempPrayer=await databaseHelper.getData(table,'-1');
       print('tempPrayer.length : ${tempPrayer.length}');
 
       String nameSurah=tempPrayer[0]['surah'];

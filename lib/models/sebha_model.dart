@@ -2,55 +2,60 @@
 
 class SebhaModel
 {
-  int _id,_counter;
-  String _nameWithDiacritics, _nameWithoutDiacritics;
+  int _id,_counter,_favorite;
+  String _name;
 
   SebhaModel(
     this._id,
-    this._nameWithDiacritics,
-    this._nameWithoutDiacritics,
+    this._name,
     this._counter,
+    this._favorite,
   );
 
   SebhaModel.fromMap(Map<String,dynamic> map)
   {
     _id=map['id'];
-    _nameWithDiacritics=map['name_with_diacritics'];
-    _nameWithoutDiacritics=map['name_without_diacritics'];
+    _name=map['name'];
     _counter=map['counter'];
+    _favorite=map['favorite'];
   }
   
   Map<String,dynamic> toMap()
   {
     return {
       'id':_id,
-      'name_with_diacritics':_nameWithDiacritics,
-      'name_without_diacritics':_nameWithoutDiacritics,
+      'name':_name,
       'counter':_counter,
+      'favorite':_favorite,
     };
   }
 
-  void setNameWithDiacritics(String value)
+  void setId(int value)
   {
-    _nameWithDiacritics=value;
-  }
-
-  void setNameWithoutDiacritics(String value)
-  {
-    _nameWithoutDiacritics=value;
+    _id=value;
   }
   
-  void setCounter(int value)
+  set setName(String value)
+  {
+    _name=value;
+  }
+  
+  set setCounter(int value)
   {
     _counter=value;
   }
 
+  void setFavorite(int value) 
+  {
+    _favorite=value;
+  }
+
   int get id => _id;
 
-  String get nameWithDiacritics => _nameWithDiacritics;
-
-  String get nameWithoutDiacritics => _nameWithoutDiacritics;
+  String get name => _name;
 
   int get counter => _counter;
+
+  int get favorite => _favorite;
 
 }

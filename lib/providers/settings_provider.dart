@@ -6,7 +6,9 @@ class SettingsProvider with ChangeNotifier
 {
   SettingsModel _settings;
   DatabaseHelper databaseHelper=new DatabaseHelper();
-  
+
+  String get table => 'settings';
+
   dynamic getsettingField(String nameField)
   {
     switch(nameField)
@@ -58,7 +60,7 @@ class SettingsProvider with ChangeNotifier
   {
     try
     {
-      List<Map<String,dynamic>> tempSettings=await databaseHelper.getSettings();
+      List<Map<String,dynamic>> tempSettings=await databaseHelper.getData(table,'-1');
       print('tempSettings.length : ${tempSettings.length}');
 
         _settings=SettingsModel.fromMap(tempSettings[0]);

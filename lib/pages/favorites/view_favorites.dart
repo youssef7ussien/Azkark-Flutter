@@ -1,8 +1,10 @@
+import 'package:azkark/util/helpers.dart';
+
 import 'view_favorite_prayer.dart';
 import 'view_favorite_sebha.dart';
 import 'view_favorite_categories.dart';
-import '../../utilities/colors.dart';
-import '../../utilities/background.dart';
+import '../../util/colors.dart';
+import '../../util/background.dart';
 import 'package:flutter/material.dart';
 
 class FavoritesView extends StatefulWidget 
@@ -26,7 +28,7 @@ class _FavoritesViewState extends State<FavoritesView>
           appBar: AppBar(
             elevation: 0.0,
             title: Text(
-              'المفضلة',
+              translate(context,'favorite_bar'),
               style: new TextStyle(
                 color: ruby[50],
                 fontWeight: FontWeight.w700,
@@ -65,28 +67,19 @@ class _FavoritesViewState extends State<FavoritesView>
           if(text=='الأذكار')
             Navigator.of(context).push(
               MaterialPageRoute(builder: (context) {
-                return Directionality(
-                  textDirection: TextDirection.rtl,
-                  child : ViewFavoriteCategories(),
-                );
+                return ViewFavoriteCategories();
               }),
             );
           else if(text=='الأدعية')
             Navigator.of(context).push(
               MaterialPageRoute(builder: (context) {
-                return Directionality(
-                  textDirection: TextDirection.rtl,
-                  child : ViewFavoritePrayer(),
-                );
+                return ViewFavoritePrayer();
               }),
             );
           if(text=='المسبحة الإلكترونية')
             Navigator.of(context).push(
               MaterialPageRoute(builder: (context) {
-                return Directionality(
-                  textDirection: TextDirection.rtl,
-                  child : ViewFavoriteSebha(),
-                );
+                return ViewFavoriteSebha();
               }),
             );
         },

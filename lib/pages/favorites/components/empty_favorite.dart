@@ -1,4 +1,4 @@
-import '../../utilities/colors.dart';
+import '../../../util/colors.dart';
 import 'package:flutter/material.dart';
 
 class EmptyFavorite extends StatelessWidget

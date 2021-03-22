@@ -1,4 +1,6 @@
-import '../../utilities/colors.dart';
+import 'package:azkark/util/helpers.dart';
+
+import '../../util/colors.dart';
 import 'list_title_of_drawer.dart';
 import 'package:provider/provider.dart';
 import '../../providers/sections_provider.dart';
@@ -15,11 +17,11 @@ class CustomDrawer extends StatefulWidget
     @required this.animationController,
     @required this.minWidth,
     @required this.maxWidth,
-    this.onTap,
+    @required this.onTap,
+    @required this.onPressedIndex,
+    @required this.currentIndex,
     this.onSwipeLeft,
     this.onSwipeRight,
-    this.currentIndex,
-    this.onPressedIndex,
   });
 
   @override
@@ -52,7 +54,14 @@ class _CustomDrawerState extends State<CustomDrawer> with SingleTickerProviderSt
   Function get onTap => widget.onTap;
   Function get onSwipeLeft => widget.onSwipeLeft;
   Function get onSwipeRight => widget.onSwipeRight;
-  Function  onPressedIndex() =>  widget.onPressedIndex(currentIndex);
+  
+  void onPressedIndex(int index)
+  {
+    setState(() {
+      currentIndex=index;
+    });
+    widget.onPressedIndex(currentIndex);
+  }
 
   @override
   Widget build(BuildContext context) 
@@ -62,7 +71,7 @@ class _CustomDrawerState extends State<CustomDrawer> with SingleTickerProviderSt
 
     return AnimatedBuilder(
       animation: animationController,
-      builder: (context, widget){
+      builder: (context, widget) {
         return Stack(
           children: <Widget>[
             if(widthAnimation.value!=minWidth)
@@ -87,16 +96,11 @@ class _CustomDrawerState extends State<CustomDrawer> with SingleTickerProviderSt
                 child: Column(
                   children: <Widget>[
                     DrawerListTitle(
-                      onTap: currentIndex==8 ? null : () {
-                        setState(() {
-                          currentIndex=8;
-                        });
-                        onPressedIndex();
-                      },
+                      onTap: currentIndex==8 ? onTap : () => onPressedIndex(8),
                       isSelected: currentIndex==8,
-                      title: 'كل الأذكار',
+                      title: translate(context,'all_categories'),
                       pathIcon:
-                        currentIndex==8 ? 
+                        currentIndex==8 ?
                         'assets/images/sections/8_128px.png'
                         : 'assets/images/sections/8_white_108px.png',
                       animationController: animationController,
@@ -113,12 +117,7 @@ class _CustomDrawerState extends State<CustomDrawer> with SingleTickerProviderSt
                         itemCount: sectionsProvider.length,
                         itemBuilder: (context, index) {
                           return DrawerListTitle(
-                            onTap: currentIndex==index ? null : () {
-                              setState(() {
-                                currentIndex=index;
-                              });
-                              onPressedIndex();
-                            },
+                            onTap: currentIndex==index ? onTap : () => onPressedIndex(index),
                             isSelected: currentIndex==index,
                             title: sectionsProvider.getSection(index).name,
                             pathIcon:

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../utilities/colors.dart';
+import '../../util/colors.dart';
 
 class LoadingPage extends StatelessWidget 
 {

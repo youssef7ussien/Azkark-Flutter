@@ -1,19 +1,19 @@
-import 'package:azkark/pages/search/search_asmaallah.dart';
-import 'package:azkark/providers/settings_provider.dart';
-
-import '../../widgets/slider_font_size/button_font_size.dart';
+import '../../util/helpers.dart';
+import '../../pages/search/search_asmaallah.dart';
+import '../../util/navigate_between_pages/fade_route.dart';
+import '../../providers/settings_provider.dart';
+import '../../widgets/search_widget/search_bar.dart';
 import '../../widgets/slider_font_size/slider_font_size.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../widgets/asmaallah_widget/asmaallah.dart';
 import '../../providers/asmaallah_provider.dart';
-import '../../utilities/colors.dart';
 import 'package:provider/provider.dart';
-import '../../utilities/background.dart';
+import '../../util/background.dart';
 import 'package:flutter/material.dart';
+
+import 'components/app_bar.dart';
 
 class ViewAsmaAllah extends StatefulWidget 
 {
-
   @override
   _ViewAsmaAllahState createState() => _ViewAsmaAllahState();
 }
@@ -36,6 +36,17 @@ class _ViewAsmaAllahState extends State<ViewAsmaAllah>
     for(int i=0 ; i<Provider.of<AsmaAllahProvider>(context,listen: false).length ; i++)
       showDescription.add(false);
   }
+
+  void onTapDescription()
+  {
+     setState(() {
+      showAllDescription=!showAllDescription;
+      showDescription.fillRange(
+        0, Provider.of<AsmaAllahProvider>(context,listen: false).length, showAllDescription
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) 
   {
@@ -46,27 +57,14 @@ class _ViewAsmaAllahState extends State<ViewAsmaAllah>
       children: <Widget>[
         Background(),
         Scaffold(
-          appBar: AppBar(
-            elevation: 0.0,
-            title: Text(
-              'أسماء الله الحسني',
-              style: new TextStyle(
-                color: ruby[50],
-                fontWeight: FontWeight.w700,
-                fontSize: 18,
-              ),
-            ),
-            actions: <Widget>[
-              ButtonFontSize(
-                showSider: showSliderFont,
-                onTap: (){
-                  setState(() {
-                    showSliderFont ? showSliderFont=false : showSliderFont=true;
-                  });
-                },
-              ),
-              _buildPopUpMenu(),
-            ],
+          appBar: CustomAppBar(
+            title: translate(context,'asmaallah_bar'),
+            description: showAllDescription,
+            sliderFont: showSliderFont,
+            onTapDescription: onTapDescription,
+            onTapFontButton:  () => setState(() {
+              showSliderFont=!showSliderFont;
+            }),
           ),
           body: Stack(
             children: <Widget>[
@@ -75,7 +73,15 @@ class _ViewAsmaAllahState extends State<ViewAsmaAllah>
                 height: size.height,
                 child: Column(
                   children: <Widget>[
-                    _buildSearchBar(size),
+                    SearchBar(
+                      title: '${translate(context,'search_for_asmaallah')} . . . ',
+                      onTap: () {
+                        Navigator.push(context,FadeRoute(page: SearchForAsmaAllah(
+                            searchItems: asmaAllahProvider.allAmaAllah,
+                          ),)
+                        );
+                      },
+                    ),
                     Expanded(
                       child: ListView.builder(
                         physics: BouncingScrollPhysics(),
@@ -127,144 +133,5 @@ class _ViewAsmaAllahState extends State<ViewAsmaAllah>
       ]
     );
   }
-
-  Widget _buildSearchBar(Size size)
-  {
-    return InkWell(
-      onTap: ()  {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) {
-            return Directionality(
-              textDirection: TextDirection.rtl,
-              child : SearchPage(),
-            );
-          }),
-        );
-      },
-      child: Container(
-          width: size.width,
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: ruby,
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10),
-            ),
-          ),
-        child: Container(
-          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-          height: size.height*0.055,
-          decoration: BoxDecoration(
-            color: ruby[700],
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            children: <Widget>[
-              Icon(
-                Icons.search,
-                color: ruby[50],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 10.0),
-                child: Text(
-                  'إبحث عن إسم من أسماء الله . . . ',
-                  style: TextStyle(
-                    color: ruby[300],
-                    fontSize: 13,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPopUpMenu()
-  {
-    return Padding(
-      padding: const EdgeInsets.only(left: 5.0),
-      child: PopupMenuButton<PopUpMenu>(
-        offset: Offset(0,50),
-        tooltip: 'قائمة الخيارات',
-        onSelected:(PopUpMenu result) async {
-          switch(result)
-          {
-            
-            case PopUpMenu.ShowAllDescription:
-            {
-              setState(() {
-                for(int i=0 ; i<Provider.of<AsmaAllahProvider>(context,listen: false).length ; i++)
-                  showAllDescription ? showDescription[i]=false : showDescription[i]=true;
-                showAllDescription=!showAllDescription;
-              });
-            } break;
-            case PopUpMenu.About:
-            {
-
-            } break;
-          }
-        },
-        itemBuilder: (context){
-          return [
-            PopupMenuItem<PopUpMenu>(
-              value: PopUpMenu.ShowAllDescription,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  FaIcon(
-                    showAllDescription ? FontAwesomeIcons.toggleOn : FontAwesomeIcons.toggleOff,
-                    color:showAllDescription ? ruby[500] : ruby,
-                    size: 20,
-                  ),
-                  Container(
-                    width: 150,
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      showAllDescription ? 'تم عرض معاني كل الأسماء' : 'عرض معاني كل الأسماء',
-                      textAlign: TextAlign.right,
-                      style: new TextStyle(
-                        color: ruby[900],
-                        fontWeight: FontWeight.w300,
-                        fontSize: 14,
-                      ),  
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            PopupMenuItem<PopUpMenu>(
-              value: PopUpMenu.About,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Icon(
-                    Icons.help_outline,
-                    color: ruby,
-                    size: 25,
-                  ),
-                  Container(
-                    width: 150,
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      'حول',
-                      textAlign: TextAlign.right,
-                      style: new TextStyle(
-                        color: ruby[900],
-                        fontWeight: FontWeight.w300,
-                        fontSize: 14,
-                      ),  
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ];
-        },
-      ),
-    );
-  }
-
 
 }

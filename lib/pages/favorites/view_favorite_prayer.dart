@@ -1,12 +1,15 @@
+import 'package:azkark/util/helpers.dart';
+
 import '../../providers/settings_provider.dart';
 import '../../widgets/prayer_widget/aya.dart';
 import '../../providers/prayer_provider.dart';
-import '../../widgets/favorites_widget/empty_favorite.dart';
-import '../../utilities/colors.dart';
+import '../../util/colors.dart';
 import '../../providers/favorites_provider.dart';
 import 'package:provider/provider.dart';
-import '../../utilities/background.dart';
+import '../../util/background.dart';
 import 'package:flutter/material.dart';
+
+import 'components/empty_favorite.dart';
 
 class ViewFavoritePrayer extends StatefulWidget 
 {
@@ -30,7 +33,7 @@ class _ViewFavoritePrayerState extends State<ViewFavoritePrayer>
           appBar: AppBar(
             elevation: 0.0,
             title: Text(
-              'المفضلة',
+              translate(context,'favorite_bar'),
               style: new TextStyle(
                 color: ruby[50],
                 fontWeight: FontWeight.w700,

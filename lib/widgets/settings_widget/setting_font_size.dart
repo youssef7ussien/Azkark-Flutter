@@ -2,7 +2,7 @@ import 'package:azkark/providers/settings_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../slider_font_size/slider_font_size.dart';
-import '../../utilities/colors.dart';
+import '../../util/colors.dart';
 import 'package:flutter/material.dart';
 
 class SettingFontSize extends StatefulWidget 

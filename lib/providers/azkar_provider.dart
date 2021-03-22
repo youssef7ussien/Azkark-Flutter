@@ -7,6 +7,8 @@ class AzkarProvider with ChangeNotifier
   List<ZekrModel> _azkar=List<ZekrModel>();
   DatabaseHelper databaseHelper=new DatabaseHelper();
 
+  String get table => 'azkar';
+
   int get length => _azkar.length;
 
   ZekrModel getZekr(int index)
@@ -19,7 +21,7 @@ class AzkarProvider with ChangeNotifier
     try
     {
       _azkar.clear();
-      List<Map<String,dynamic>> tempAzkar=await databaseHelper.getAllAzkar(azkarIndex);
+      List<Map<String,dynamic>> tempAzkar=await databaseHelper.getData(table,azkarIndex);
       print('tempAzkar.length : ${tempAzkar.length}');
 
       for(int i=0 ; i<tempAzkar.length ; i++)

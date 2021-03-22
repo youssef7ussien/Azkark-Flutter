@@ -1,9 +1,11 @@
+import '../../providers/settings_provider.dart';
+import '../../util/navigate_between_pages/fade_route.dart';
 import '../../providers/favorites_provider.dart';
 import '../../pages/azkar/view_azkar.dart';
 import '../../providers/azkar_provider.dart';
 import '../../models/category_model.dart';
 import '../../providers/categories_provider.dart';
-import '../../utilities/colors.dart';
+import '../../util/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +21,13 @@ class Category extends StatefulWidget
 
 class _CategoryState extends State<Category> 
 {
+  double fontSize;
+  @override
+  void initState() 
+  {
+    super.initState();
+    fontSize=Provider.of<SettingsProvider>(context,listen: false).getsettingField('font_size')-2;
+  }
 
   @override
   Widget build(BuildContext context) 
@@ -38,28 +47,24 @@ class _CategoryState extends State<Category>
           highlightColor: ruby[100],
           borderRadius: BorderRadius.circular(10),
           onTap: () async {
-            print('${widget._category.nameWithDiacritics}');
-            print('${categoriesProvider.getCategory(widget._category.id).azkarIndex}');
             await azkarProvider.initialAllAzkar(categoriesProvider.getCategory(widget._category.id).azkarIndex);
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) {
-                return Directionality(
-                  textDirection: TextDirection.rtl,
-                  child : ViewAzkar(),
-                );
-              }),
-            );
+            Navigator.push(context,FadeRoute(page: ViewAzkar()));
           },
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: _buildNameField(),
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: _buildNameField(),
+                    ),
+                    _buildFavoriteButton(categoriesProvider)
+                  ],
                 ),
-                _buildFavoriteButton(categoriesProvider)
-              ],
-            ),
+              ),
+              // _buildBottomWidget(size),
+            ],
           ),
         ),
       ),
@@ -68,12 +73,13 @@ class _CategoryState extends State<Category>
 
   Widget _buildNameField()
   {
+    bool diacritics=Provider.of<SettingsProvider>(context,listen: false).getsettingField('diacritics');
     return Text(
-      widget._category.nameWithDiacritics,
+      diacritics ? widget._category.nameWithDiacritics : widget._category.nameWithoutDiacritics,
       style: new TextStyle(
         color: ruby,
         fontWeight: FontWeight.w700,
-        fontSize: 13,
+        fontSize: fontSize,
       ),
     );
   }
@@ -112,4 +118,28 @@ class _CategoryState extends State<Category>
       ),
     );
   }
+
+  // Widget _buildBottomWidget(Size size)
+  // {
+  //   final settingsProvider=Provider.of<SettingsProvider>(context,listen: false);
+  //   return Container(
+  //     width: size.width,
+  //     padding: EdgeInsets.symmetric(horizontal: 12.0,vertical: 5.0),
+  //     decoration: BoxDecoration(
+  //       color: ruby[200],
+  //       borderRadius: BorderRadius.only(
+  //         bottomLeft: Radius.circular(10),
+  //         bottomRight: Radius.circular(10),
+  //       )
+  //     ),
+  //     child: Text(
+  //       'عدد الأذكار : ${List.from(jsonDecode(widget._category.azkarIndex)).length}',
+  //       style: new TextStyle(
+  //         color: ruby[700],
+  //         fontFamily: settingsProvider.getsettingField('font_family').toString(),
+  //         fontSize: settingsProvider.getsettingField('font_size'),
+  //       ),
+  //     ),
+  //   );
+  // }
 }

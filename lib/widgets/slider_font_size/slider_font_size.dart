@@ -1,7 +1,7 @@
-import '../../utilities/colors.dart';
+import '../../util/colors.dart';
 import 'package:flutter/material.dart';
 
-class SliderFontSize extends StatefulWidget 
+class SliderFontSize extends StatelessWidget 
 {
   final double fontSize,min,max,divisions;
   final Function onChanged,onChangedEnd;
@@ -16,12 +16,7 @@ class SliderFontSize extends StatefulWidget
   this.onChanged,
   this.onChangedEnd,
   });
-  @override
-  _SliderFontSizeState createState() => _SliderFontSizeState();
-}
 
-class _SliderFontSizeState extends State<SliderFontSize> 
-{
   @override
   Widget build(BuildContext context) 
   {
@@ -32,7 +27,7 @@ class _SliderFontSizeState extends State<SliderFontSize>
       width: size.width*0.8,
       height: size.height*0.1,
       decoration: BoxDecoration(
-        color: widget.overlayColor==null ?  ruby[100].withAlpha(175) : widget.overlayColor,
+        color: overlayColor==null ?  ruby[100].withAlpha(175) : overlayColor,
         borderRadius: BorderRadius.circular(15),
       ),
       child: Row(
@@ -57,17 +52,17 @@ class _SliderFontSizeState extends State<SliderFontSize>
                 valueIndicatorColor: ruby[500],
                 valueIndicatorTextStyle: TextStyle(
                   color: ruby[100],
-                  fontSize: widget.fontSize,
+                  fontSize: fontSize,
                 ),
               ),
               child: Slider(
                 min: 14,
                 max: 30,
                 divisions: 8,
-                label: '${widget.fontSize}',
-                value: widget.fontSize,
-                onChanged: widget.onChanged,
-                onChangeEnd: widget.onChangedEnd,
+                label: '$fontSize',
+                value: fontSize,
+                onChanged: onChanged,
+                onChangeEnd: onChangedEnd,
               ),
             ),
           ),

@@ -1,39 +1,25 @@
-import '../../utilities/colors.dart';
+import 'package:azkark/util/helpers.dart';
 import '../../widgets/categories_widget/category.dart';
 import '../../providers/categories_provider.dart';
 import 'package:provider/provider.dart';
-import '../../utilities/background.dart';
+import '../../util/background.dart';
 import 'package:flutter/material.dart';
+import 'components/app_bar.dart';
 
-class ViewAllCategories extends StatefulWidget 
+class ViewAllCategories extends StatelessWidget 
 {
 
-  @override
-  _ViewAllCategoriesState createState() => _ViewAllCategoriesState();
-}
-
-class _ViewAllCategoriesState extends State<ViewAllCategories> 
-{
   @override
   Widget build(BuildContext context) 
   {
-    final size=MediaQuery.of(context).size;
     final categoriesProvider=Provider.of<CategoriesProvider>(context,listen: false);
 
     return Stack(
       children: <Widget>[
         Background(),
         Scaffold(
-          appBar: AppBar(
-            elevation: 0.0,
-            title: Text(
-              'كل الأذكار',
-              style: new TextStyle(
-                color: ruby[50],
-                fontWeight: FontWeight.w700,
-                fontSize: 18,
-              ),
-            ),
+          appBar: CustomAppBar(
+            title: translate(context,'all_categories'),
           ),
           body: ListView.builder(
             physics: BouncingScrollPhysics(),

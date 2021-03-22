@@ -19,6 +19,8 @@ class SectionsProvider with ChangeNotifier
 
   bool get isNewUser => _newUser;
 
+  String get table => 'sections';
+
   int get length => _sections.length;
 
   SectionModel getSection(int index)
@@ -35,7 +37,7 @@ class SectionsProvider with ChangeNotifier
   {
     try
     {
-      List<Map<String,dynamic>> tempSections=await databaseHelper.getAllSections();
+      List<Map<String,dynamic>> tempSections=await databaseHelper.getData(table,'-1');
       print('tempSections.length : ${tempSections.length}');
 
       for(int i=0 ; i<tempSections.length ; i++)
@@ -70,7 +72,7 @@ class SectionsProvider with ChangeNotifier
 
     await initialAllSections();
     print('initialAllSections');
-    try 
+    try
     {
       await Provider.of<SettingsProvider>(context,listen: false).initialSettings();
       await Provider.of<CategoriesProvider>(context,listen: false).initialAllCategories();
@@ -78,7 +80,7 @@ class SectionsProvider with ChangeNotifier
       await Provider.of<FavoritesProvider>(context,listen: false).initialAllFavorites();
       await Provider.of<PrayerProvider>(context,listen: false).initialAllPrayer();
       await Provider.of<AsmaAllahProvider>(context,listen: false).initialAllAsmaAllah();
-      print('initialAllCategories, initialAllItemsOfSebha, initialAllFavorites, initialAllPrayer, initialSettings');
+      print('initialAll Categories, AllItemsOfSebha, AllFavorites, AllPrayer');
     }
     catch(e)
     {
