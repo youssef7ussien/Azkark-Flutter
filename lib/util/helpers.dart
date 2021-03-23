@@ -20,7 +20,7 @@ void copyText(BuildContext context,String text)
 { 
   Clipboard.setData(ClipboardData(text: text));
 
-  Scaffold.of(context).showSnackBar(SnackBar(
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: Text(
         translate(context,'done_copy'),
         style: new TextStyle(

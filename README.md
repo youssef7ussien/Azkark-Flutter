@@ -2,7 +2,7 @@
 
 ![Banner](readme_images/banner.png)
 
-![Flutter version](https://img.shields.io/badge/Flutter-v2.0.3-blue?style=flat&logo=Flutter) ![Dart version](https://img.shields.io/badge/Dart-v2.12.2-blue?style=flat&logo=Dart) ![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-red?style=flat)
+![Flutter version](https://img.shields.io/badge/Flutter-v2.0.3-blue?style=flat&logo=Flutter) ![Dart version](https://img.shields.io/badge/Dart-v2.12.2-blue?style=flat&logo=Dart) ![Azkark version](https://img.shields.io/badge/Azkark-v1.0.0-green?style=flat) ![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-red?style=flat)
 
 ## Installation steps
 
