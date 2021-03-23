@@ -1,8 +1,8 @@
-# ![icon](readme_images/small_icon.png) Azkark
-
-It’s an Azkar application that contains azkar’ taken from hisn al muslim book.
+<h1 align="center"> <img height='25' alt='icon' src='./readme_images/small_icon.png'/>  Azkark</h1><p align="center">It’s an Azkar application that contains azkar taken from <b>Hisn Al-Muslim book</b>. <br> <b>Developed using Flutter</b>.</p>
 
 ![Banner](readme_images/banner.png)
+
+![Flutter version](https://img.shields.io/badge/Flutter-v2.0.3-blue?style=flat&logo=Flutter) ![Dart version](https://img.shields.io/badge/Dart-v2.12.2-blue?style=flat&logo=Dart) ![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4-red?style=flat)
 
 ## Installation steps
 
@@ -23,13 +23,13 @@ flutter run
 | ![Pages 3](readme_images/pages_3.png) |
 | ![Pages 4](readme_images/pages_4.png) |
 
-
 ## Author
 
 #### Youssef Hussien
 
->> You can also follow my GitHub Profile to stay updated about my latest projects: [GitHub Follow](https://github.com/youssef7ussien)
+> You can also follow my GitHub Profile to stay updated about my latest projects: 
+> 
+> [![GitHub Follow](https://img.shields.io/badge/Follow-Youssef-lightgrey?style=social&logo=github)](https://github.com/youssef7ussien)
 
->> If you liked the repo then kindly support it by giving it a star ⭐!
+> If you liked the repo then kindly support it by giving it a star ⭐!
 
-Copyright (c) 2020
